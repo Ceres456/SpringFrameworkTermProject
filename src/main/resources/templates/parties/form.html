@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${formTitle} + ' - GameParty'">파티 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main>
+    <div class="card wide">
+        <h2 th:text="${formTitle}">파티 만들기</h2>
+        <form th:action="@{${formAction}}" th:object="${partyForm}" method="post">
+            <div class="notice fail" th:if="${#fields.hasGlobalErrors()}">
+                <div th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
+            </div>
+
+            <span class="field-label">게임 선택</span>
+            <div class="game-grid">
+                <label class="game-card" th:each="g : ${games}">
+                    <input type="radio" th:field="*{gameId}" th:value="${g.id}">
+                    <span class="thumb" th:style="'--h:' + ${(g.id * 47) % 360}">
+                        <img th:if="${g.slug != null}" th:src="@{/images/games/{s}.jpg(s=${g.slug})}"
+                             alt="" loading="lazy" onerror="this.remove()">
+                        <span class="thumb-name" th:text="${g.name}"></span>
+                        <span class="check">✓</span>
+                    </span>
+                </label>
+            </div>
+            <div class="error" th:if="${#fields.hasErrors('gameId')}" th:errors="*{gameId}"></div>
+
+            <label for="title">제목</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="예) 발로란트 랭크 같이 하실 분">
+            <div class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+
+            <label for="maxMembers">모집 인원 (방장 포함)</label>
+            <input type="number" id="maxMembers" th:field="*{maxMembers}" min="2" max="20">
+            <div class="error" th:if="${#fields.hasErrors('maxMembers')}" th:errors="*{maxMembers}"></div>
+
+            <label for="contactLink">디스코드/오픈채팅 링크 (선택)</label>
+            <input type="text" id="contactLink" th:field="*{contactLink}" placeholder="https://...">
+            <div class="error" th:if="${#fields.hasErrors('contactLink')}" th:errors="*{contactLink}"></div>
+
+            <label for="content">내용</label>
+            <textarea id="content" th:field="*{content}" rows="8"
+                      placeholder="플레이 시간대, 티어, 원하는 파티원 등을 적어주세요."></textarea>
+            <div class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+
+            <div class="actions">
+                <button type="submit" class="btn">저장</button>
+                <a class="btn ghost" th:href="@{/parties}">취소</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

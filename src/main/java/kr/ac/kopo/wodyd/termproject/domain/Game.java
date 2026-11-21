@@ -27,9 +27,22 @@ public class Game {
     @Column(length = 30)
     private String genre;
 
+    /**
+     * 이미지 파일 이름(확장자 제외). 화면에서는 /images/games/{slug}.jpg 를 읽고,
+     * 파일이 없으면 게임별 색상 카드로 대체한다.
+     */
+    @Column(length = 50)
+    private String slug;
+
     @Builder
-    private Game(String name, String genre) {
+    private Game(String name, String genre, String slug) {
         this.name = name;
         this.genre = genre;
+        this.slug = slug;
+    }
+
+    public void updateInfo(String genre, String slug) {
+        this.genre = genre;
+        this.slug = slug;
     }
 }

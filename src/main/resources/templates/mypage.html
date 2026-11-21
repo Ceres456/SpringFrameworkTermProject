@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>마이페이지 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main>
+    <h2>마이페이지</h2>
+
+    <!-- 내 정보 -->
+    <section class="panel profile">
+        <div class="profile-main">
+            <div>
+                <div class="profile-name" th:text="${me.nickname}">닉네임</div>
+                <div class="sub" th:text="'@' + ${me.username}"></div>
+            </div>
+            <div class="score">
+                <span class="score-num" th:if="${me.reviewCount > 0}" th:text="${me.mannerScore}"></span>
+                <span class="score-num none" th:unless="${me.reviewCount > 0}">-</span>
+                <span class="sub" th:text="'매너 점수 · ' + ${me.reviewCount} + '명 평가'"></span>
+            </div>
+        </div>
+        <dl class="info">
+            <dt>주 게임</dt>
+            <dd th:text="${me.mainGame != null and !me.mainGame.isEmpty()} ? ${me.mainGame} : '등록하지 않음'"></dd>
+            <dt>가입일</dt>
+            <dd th:text="${#temporals.format(me.joinedAt, 'yyyy-MM-dd')}"></dd>
+        </dl>
+    </section>
+
+    <!-- 내가 만든 파티 -->
+    <section class="panel section">
+        <h3 th:text="'내가 만든 파티 (' + ${me.hostedParties.size()} + ')'">내가 만든 파티</h3>
+        <p class="hint" th:if="${me.hostedParties.isEmpty()}">
+            아직 만든 파티가 없어요. <a th:href="@{/parties/new}">파티 만들기</a>
+        </p>
+        <div class="table-wrap" th:unless="${me.hostedParties.isEmpty()}">
+            <table class="table">
+                <thead>
+                <tr><th>게임</th><th>제목</th><th>인원</th><th>상태</th><th>신청 대기</th><th>작성일</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${me.hostedParties}">
+                    <td th:text="${p.gameName}"></td>
+                    <td class="title"><a th:href="@{/parties/{id}(id=${p.id})}" th:text="${p.title}"></a></td>
+                    <td th:text="${p.currentMembers} + ' / ' + ${p.maxMembers}"></td>
+                    <td><span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(p.status.name())}"
+                              th:text="${p.status.label}"></span></td>
+                    <td>
+                        <span class="badge badge-pending" th:if="${p.pendingCount > 0}"
+                              th:text="${p.pendingCount} + '건'"></span>
+                        <span class="sub" th:unless="${p.pendingCount > 0}">-</span>
+                    </td>
+                    <td th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 내 신청 현황 -->
+    <section class="panel section">
+        <h3 th:text="'내 신청 현황 (' + ${me.applications.size()} + ')'">내 신청 현황</h3>
+        <p class="hint" th:if="${me.applications.isEmpty()}">
+            신청한 파티가 없어요. <a th:href="@{/parties}">파티 찾기</a>
+        </p>
+        <div class="table-wrap" th:unless="${me.applications.isEmpty()}">
+            <table class="table">
+                <thead>
+                <tr><th>게임</th><th>파티</th><th>내 신청</th><th>파티 상태</th><th>신청일</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${me.applications}">
+                    <td th:text="${a.gameName}"></td>
+                    <td class="title">
+                        <a th:href="@{/parties/{id}(id=${a.partyId})}" th:text="${a.partyTitle}"></a>
+                        <a class="mini-link"
+                           th:if="${a.partyStatus.name() == 'CLOSED' and a.applyStatus.name() == 'APPROVED'}"
+                           th:href="@{/parties/{id}(id=${a.partyId})}">리뷰</a>
+                    </td>
+                    <td><span class="badge" th:classappend="'badge-apply-' + ${#strings.toLowerCase(a.applyStatus.name())}"
+                              th:text="${a.applyStatus.label}"></span></td>
+                    <td><span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(a.partyStatus.name())}"
+                              th:text="${a.partyStatus.label}"></span></td>
+                    <td th:text="${#temporals.format(a.appliedAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 받은 리뷰 -->
+    <section class="panel section">
+        <h3 th:text="'받은 리뷰 (' + ${me.receivedReviews.size()} + ')'">받은 리뷰</h3>
+        <p class="hint" th:if="${me.receivedReviews.isEmpty()}">
+            아직 받은 리뷰가 없어요. 파티를 종료하면 파티원이 매너 리뷰를 남길 수 있어요.
+        </p>
+        <ul class="members">
+            <li th:each="r : ${me.receivedReviews}">
+                <span class="nick" th:text="${r.reviewerNickname}"></span>
+                <span class="stars" th:text="${#strings.repeat('★', r.rating)} + ' ' + ${r.rating} + '점'"></span>
+                <span class="sub" th:if="${r.comment != null}" th:text="${r.comment}"></span>
+                <span class="sub meta">
+                    <a th:href="@{/parties/{id}(id=${r.partyId})}" th:text="${r.partyTitle}"></a>
+                    · <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></span>
+                </span>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

@@ -82,6 +82,14 @@ public class Party {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void update(String title, String content, Game game, int maxMembers, String contactLink) {
+        this.title = title;
+        this.content = content;
+        this.game = game;
+        this.maxMembers = maxMembers;
+        this.contactLink = contactLink;
+    }
+
     public void changeStatus(PartyStatus status) {
         this.status = status;
     }

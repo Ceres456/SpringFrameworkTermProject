@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>파티 찾기 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main>
+    <h2>파티 찾기</h2>
+    <div class="notice ok" th:if="${message}" th:text="${message}"></div>
+    <div class="notice fail" th:if="${error}" th:text="${error}"></div>
+
+    <div class="toolbar">
+        <form th:action="@{/parties}" method="get" class="search">
+            <select name="gameId">
+                <option value="">전체 게임</option>
+                <option th:each="g : ${games}" th:value="${g.id}" th:text="${g.name}"
+                        th:selected="${g.id == gameId}"></option>
+            </select>
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="제목 검색">
+            <button type="submit" class="btn small">검색</button>
+        </form>
+        <a class="btn small" th:href="@{/parties/new}" sec:authorize="isAuthenticated()">+ 파티 만들기</a>
+    </div>
+
+    <div class="table-wrap">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>게임</th>
+            <th>제목</th>
+            <th>방장</th>
+            <th>인원</th>
+            <th>상태</th>
+            <th>작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${parties.content}">
+            <td th:text="${p.gameName}"></td>
+            <td class="title"><a th:href="@{/parties/{id}(id=${p.id})}" th:text="${p.title}"></a></td>
+            <td th:text="${p.hostNickname}"></td>
+            <td th:text="${p.currentMembers} + ' / ' + ${p.maxMembers}"></td>
+            <td><span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(p.status.name())}"
+                      th:text="${p.status.label}"></span></td>
+            <td th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+        </tr>
+        <tr th:if="${parties.empty}">
+            <td colspan="6" class="empty">등록된 파티가 없습니다.</td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <div class="pagination" th:if="${parties.totalPages > 1}">
+        <a th:each="i : ${#numbers.sequence(0, parties.totalPages - 1)}"
+           th:href="@{/parties(page=${i}, gameId=${gameId}, keyword=${keyword})}"
+           th:text="${i + 1}"
+           th:classappend="${i == parties.number} ? 'active'"></a>
+    </div>
+</main>
+</body>
+</html>

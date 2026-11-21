@@ -7,10 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header class="nav">
-    <a class="logo" th:href="@{/}">🎮 GameParty</a>
-    <nav><a th:href="@{/login}">로그인</a></nav>
-</header>
+<header th:replace="~{fragments/header :: header}"></header>
 <main>
     <div class="card">
         <h2>회원가입</h2>

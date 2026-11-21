@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header class="nav" th:fragment="header">
+    <a class="logo" th:href="@{/}">🎮 GameParty</a>
+    <nav>
+        <a th:href="@{/parties}">파티 찾기</a>
+        <a th:href="@{/parties/new}" sec:authorize="isAuthenticated()">파티 만들기</a>
+        <span sec:authorize="isAuthenticated()">
+            <a class="user" th:href="@{/mypage}"><span sec:authentication="name"></span>님 (마이페이지)</a>
+            <form th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" class="link">로그아웃</button>
+            </form>
+        </span>
+        <span sec:authorize="!isAuthenticated()">
+            <a th:href="@{/login}">로그인</a>
+            <a th:href="@{/signup}">회원가입</a>
+        </span>
+    </nav>
+</header>
+</body>
+</html>
