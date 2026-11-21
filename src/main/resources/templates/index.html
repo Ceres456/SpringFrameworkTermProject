@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="nav">
+    <a class="logo" th:href="@{/}">🎮 GameParty</a>
+    <nav>
+        <span sec:authorize="isAuthenticated()">
+            <span sec:authentication="name"></span>님
+            <form th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" class="link">로그아웃</button>
+            </form>
+        </span>
+        <span sec:authorize="!isAuthenticated()">
+            <a th:href="@{/login}">로그인</a>
+            <a th:href="@{/signup}">회원가입</a>
+        </span>
+    </nav>
+</header>
+<main>
+    <section class="hero">
+        <h1>같이 할 파티원, 여기서 구하자</h1>
+        <p>게임별 파티를 모집하고, 함께한 파티원의 매너를 평가해보세요.</p>
+    </section>
+</main>
+</body>
+</html>
