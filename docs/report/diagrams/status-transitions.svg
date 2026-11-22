@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 560" width="1240" height="560" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+<title>GameParty 상태 전이도</title>
+<rect width="1240" height="560" fill="#ffffff"/>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+  <marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<text x="40" y="36" font-size="22" font-weight="bold" fill="#1f2430" text-anchor="start" >GameParty 상태 전이도</text>
+<rect x="30" y="60" width="590" height="470" rx="14" fill="#faf5ff" stroke="#c4b5fd" stroke-width="1.5"/>
+<text x="50" y="90" font-size="17" font-weight="bold" fill="#6d28d9" text-anchor="start" >파티 상태 (PartyStatus)</text>
+<circle cx="70" cy="200" r="9" fill="#475569"/>
+<polyline points="80,200 140,200" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<text x="70" y="232" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="middle" >파티 만들기</text>
+<rect x="140" y="168" width="170" height="64" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2.2"/>
+<text x="225.0" y="198.0" font-size="16" font-weight="bold" fill="#16a34a" text-anchor="middle" >모집중</text>
+<text x="225.0" y="217.0" font-size="11" font-weight="normal" fill="#667085" text-anchor="middle" font-family="Consolas,'D2Coding','Courier New',monospace" >RECRUITING</text>
+<rect x="420" y="168" width="170" height="64" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="2.2"/>
+<text x="505.0" y="198.0" font-size="16" font-weight="bold" fill="#d97706" text-anchor="middle" >인원마감</text>
+<text x="505.0" y="217.0" font-size="11" font-weight="normal" fill="#667085" text-anchor="middle" font-family="Consolas,'D2Coding','Courier New',monospace" >FULL</text>
+<rect x="280" y="380" width="170" height="64" rx="14" fill="#ffffff" stroke="#475569" stroke-width="2.2"/>
+<rect x="285" y="385" width="160" height="54" rx="10" fill="none" stroke="#475569" stroke-width="1.2"/>
+<text x="365.0" y="410.0" font-size="16" font-weight="bold" fill="#475569" text-anchor="middle" >종료</text>
+<text x="365.0" y="429.0" font-size="11" font-weight="normal" fill="#667085" text-anchor="middle" font-family="Consolas,'D2Coding','Courier New',monospace" >CLOSED</text>
+<polyline points="310,186 420,186" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="315" y="163.5" width="101" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="365" y="176" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="middle" >승인 인원 = 정원</text>
+<polyline points="420,216 310,216" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="301" y="233.5" width="128" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="365" y="246" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="middle" >참가 취소 · 정원 늘림</text>
+<polyline points="225,232 315,380" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="130" y="299.5" width="128" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="258" y="312" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="end" >방장 종료 · 강제 종료</text>
+<polyline points="505,232 415,380" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="466" y="299.5" width="128" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="466" y="312" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="start" >방장 종료 · 강제 종료</text>
+<text x="365" y="478" font-size="12" font-weight="bold" fill="#1f2430" text-anchor="middle" >종료 후: 참가자끼리 매너 리뷰 작성 가능 (같은 사람에게 1회)</text>
+<text x="365" y="498" font-size="12" font-weight="normal" fill="#667085" text-anchor="middle" >종료된 파티는 수정 · 삭제 · 신청 · 신청 처리가 모두 막힘</text>
+<rect x="650" y="60" width="560" height="470" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+<text x="670" y="90" font-size="17" font-weight="bold" fill="#1d4ed8" text-anchor="start" >참가 신청 상태 (ApplyStatus)</text>
+<circle cx="690" cy="200" r="9" fill="#475569"/>
+<polyline points="700,200 750,200" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<text x="690" y="232" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="middle" >참가 신청</text>
+<rect x="750" y="168" width="160" height="64" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="2.2"/>
+<text x="830.0" y="198.0" font-size="16" font-weight="bold" fill="#d97706" text-anchor="middle" >승인 대기</text>
+<text x="830.0" y="217.0" font-size="11" font-weight="normal" fill="#667085" text-anchor="middle" font-family="Consolas,'D2Coding','Courier New',monospace" >PENDING</text>
+<rect x="1010" y="168" width="160" height="64" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2.2"/>
+<text x="1090.0" y="198.0" font-size="16" font-weight="bold" fill="#16a34a" text-anchor="middle" >참가 중</text>
+<text x="1090.0" y="217.0" font-size="11" font-weight="normal" fill="#667085" text-anchor="middle" font-family="Consolas,'D2Coding','Courier New',monospace" >APPROVED</text>
+<rect x="750" y="340" width="160" height="64" rx="14" fill="#ffffff" stroke="#dc2626" stroke-width="2.2"/>
+<text x="830.0" y="370.0" font-size="16" font-weight="bold" fill="#dc2626" text-anchor="middle" >거절됨</text>
+<text x="830.0" y="389.0" font-size="11" font-weight="normal" fill="#667085" text-anchor="middle" font-family="Consolas,'D2Coding','Courier New',monospace" >REJECTED</text>
+<polyline points="910,200 1010,200" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="928" y="177.5" width="64" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="960" y="190" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="middle" >방장 승인</text>
+<polyline points="830,232 830,340" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="838" y="279.5" width="64" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="838" y="292" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="start" >방장 거절</text>
+<circle cx="1090" cy="372" r="13" fill="none" stroke="#475569" stroke-width="2"/>
+<circle cx="1090" cy="372" r="7" fill="#475569"/>
+<polyline points="1090,232 1090,358" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
+<rect x="1100" y="287.5" width="118" height="18.5" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="1100" y="300" font-size="11.5" font-weight="bold" fill="#1f2430" text-anchor="start" >본인 취소 (종료 전)</text>
+<text x="1090" y="408" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="middle" >신청 내역 삭제</text>
+<text x="670" y="468" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >• 방장은 파티를 만들 때 자동으로 '참가 중'으로 등록됩니다.</text>
+<text x="670" y="489" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >• 승인 대기 상태에서도 본인이 취소할 수 있습니다.</text>
+<text x="670" y="510" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >• 승인은 정원에 여유가 있을 때만 가능합니다 (동시 처리는 비관적 락).</text>
+</svg>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameParty 보고서 자료</title>
+<style>
+  /* 인쇄(PDF): 기본은 세로 A4, 큰 다이어그램은 가로 A4 */
+  @page { size: A4 portrait; margin: 14mm 14mm 16mm; }
+  @page land { size: A4 landscape; margin: 10mm 12mm 12mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0; color: #1f2430; background: #fff; font-size: 11pt; line-height: 1.6;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 26pt; margin: 0 0 4px; letter-spacing: -0.02em; }
+  h2 { font-size: 16pt; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 3px solid #ff5a1f; }
+  h3 { font-size: 12pt; margin: 18px 0 6px; }
+  p { margin: 6px 0; }
+  .sub { color: #667085; }
+  .cover { padding: 8mm 0 6mm; border-bottom: 1px solid #cbd5e1; margin-bottom: 6mm; }
+  .cover .tag { display: inline-block; background: #ff5a1f; color: #fff; font-weight: 700; padding: 2px 10px; border-radius: 4px; font-size: 10pt; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 14px; font-size: 10pt; }
+  th, td { border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; white-space: nowrap; }
+  ul { margin: 6px 0 6px 1.2em; padding: 0; }
+  li { margin: 2px 0; }
+  code { font-family: Consolas, 'D2Coding', monospace; background: #f1f5f9; padding: 0 4px; border-radius: 3px; font-size: 0.92em; }
+  section { margin-bottom: 10mm; }
+  .land { page: land; break-before: page; }
+  .tall { break-before: page; }
+  .figure { margin: 0; text-align: center; }
+  .figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .land .figure img { max-height: 150mm; width: auto; }
+  .tall .figure img { max-height: 235mm; width: auto; }
+  figcaption { color: #667085; font-size: 9.5pt; margin-top: 6px; }
+  .shots { display: block; }
+  .shot { break-inside: avoid; margin: 0 0 8mm; }
+  .shot h3 { margin: 0 0 4px; }
+  .shot p { margin: 0 0 6px; color: #475467; font-size: 10pt; }
+  .shot img { display: block; width: 100%; height: auto; border: 1px solid #cbd5e1; border-radius: 4px; }
+  .shot.tallshot img { max-height: 215mm; width: auto; max-width: 100%; margin: 0 auto; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media screen { section { padding-bottom: 8mm; border-bottom: 1px dashed #cbd5e1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= 1. 개요 ================= -->
+<section>
+  <div class="cover">
+    <span class="tag">보고서 자료</span>
+    <h1>GameParty</h1>
+    <p class="sub">게임 파티 모집 · 참가 신청 · 매너 리뷰 게시판 &nbsp;|&nbsp; Spring Boot + JPA + MySQL</p>
+    <p class="sub">이 문서는 보고서에 넣을 ER 다이어그램, 시스템 구조도, 실행 흐름도, 대표 화면을 모아 둔 자료입니다.</p>
+  </div>
+
+  <h2>1. 프로젝트 개요</h2>
+  <table>
+    <tr><th>주제</th><td>같이 게임할 사람을 찾는 <b>게임 파티 모집 게시판</b>. 파티를 만들고, 참가 신청과 승인을 거쳐 함께 플레이한 뒤, 파티원끼리 <b>매너 리뷰</b>를 남겨 신뢰 점수를 쌓는다.</td></tr>
+    <tr><th>기술 스택</th><td>Java 21 · Gradle · Spring Boot 4.2 · Spring MVC + Thymeleaf · Spring Data JPA(Hibernate) · Spring Security(BCrypt, CSRF) · MySQL 8 · Lombok · 순수 CSS/JS</td></tr>
+    <tr><th>DB 연동</th><td>JPA 엔티티 5개(회원·게임·파티·참가 신청·매너 리뷰)를 MySQL 테이블로 매핑. 회원가입과 로그인도 DB의 회원 테이블로 처리(비밀번호는 BCrypt 암호화).</td></tr>
+  </table>
+
+  <h3>주요 기능</h3>
+  <ul>
+    <li><b>회원</b> : 회원가입(아이디·닉네임 중복 검사, 주 게임 선택), 로그인/로그아웃, 마이페이지, 내 정보 수정(닉네임·주 게임·비밀번호 변경)</li>
+    <li><b>파티</b> : 파티 만들기·수정·삭제, 게임별 필터와 제목 검색, 12개씩 페이지, 상세 화면 옆에서 다른 파티 둘러보기</li>
+    <li><b>참가 신청</b> : 신청 → 방장 승인/거절, 신청 취소, 정원이 차면 자동 ‘인원마감’(동시 처리는 비관적 락으로 보호)</li>
+    <li><b>매너 리뷰</b> : 파티 종료 후 참가자끼리 별점(1~5)과 한줄평, 같은 사람에게 1회, 받은 리뷰의 평균이 매너 점수로 표시</li>
+    <li><b>관리자</b> : 대시보드 통계, 회원 관리(조회·정보 수정·권한 부여·삭제), 파티 관리(상태별 보기·강제 종료·삭제), 리뷰 관리(삭제 시 매너 점수 재계산)</li>
+    <li><b>편의</b> : 게임 선택 칸(3×3 · 드래그 · 이름/장르/초성 검색), 사이트 디자인의 확인창, 시연용 더미 데이터</li>
+  </ul>
+
+  <h3>실행 방법</h3>
+  <ul>
+    <li>MySQL 8 에 접속 계정을 준비하고, 프로젝트 루트의 <code>local-db.properties</code>(Git 제외 파일)에 DB 계정과 관리자 계정 설정을 넣는다.</li>
+    <li><code>.\gradlew.bat bootRun</code> 으로 실행하면 테이블이 자동 생성되고, 게임 39종과 관리자 계정이 만들어진다. 접속 주소는 <code>http://localhost:8080</code>.</li>
+    <li>시연용 더미 데이터(회원 12명, 파티 30개, 리뷰)는 <code>--app.seed-dummy=true</code> 옵션으로 한 번 실행하면 들어간다.</li>
+  </ul>
+</section>
+
+<!-- ================= 2. ER ================= -->
+<section class="land">
+  <h2>2. ER 다이어그램</h2>
+  <figure class="figure">
+    <img src="diagrams/er-diagram.svg" alt="GameParty ER 다이어그램">
+    <figcaption>회원 1:N 파티(방장), 게임 1:N 파티, 파티·회원 N:M(참가 신청으로 분해), 파티 1:N 매너 리뷰, 회원 1:N 리뷰(작성자·받는 사람)</figcaption>
+  </figure>
+</section>
+
+<section class="tall">
+  <h2>2-1. 테이블 명세</h2>
+  <table>
+    <tr><th style="width:18%">테이블</th><th>설명</th><th style="width:34%">제약 조건</th></tr>
+    <tr><td><code>member</code> 회원</td><td>로그인 계정과 프로필. 권한(<code>USER</code>/<code>ADMIN</code>), 주 게임, 받은 리뷰로 계산되는 매너 점수·평가 수를 가진다.</td><td>아이디 유니크, 닉네임 유니크</td></tr>
+    <tr><td><code>game</code> 게임</td><td>모집 대상 게임 목록. 서버 시작 시 39종이 등록되고, 이미지 파일 이름(<code>slug</code>)을 가진다.</td><td>이름 유니크</td></tr>
+    <tr><td><code>party</code> 파티</td><td>모집글. 게임과 방장(회원)을 참조하고, 최대 인원, 연락 링크, 상태(<code>RECRUITING</code>/<code>FULL</code>/<code>CLOSED</code>)를 가진다.</td><td>game_id, host_id 외래키</td></tr>
+    <tr><td><code>party_member</code> 참가 신청</td><td>회원과 파티의 N:M 관계를 푼 연결 테이블. 신청 상태(<code>PENDING</code>/<code>APPROVED</code>/<code>REJECTED</code>)와 신청 시각을 가진다. 방장도 ‘참가 중’으로 함께 등록된다.</td><td>(party_id, member_id) 복합 유니크</td></tr>
+    <tr><td><code>party_review</code> 매너 리뷰</td><td>종료된 파티에서 참가자끼리 남기는 별점(1~5)과 한줄평. 작성자와 받는 사람은 모두 회원을 참조한다.</td><td>(party_id, reviewer_id, target_id) 복합 유니크</td></tr>
+  </table>
+
+  <h3>업무 규칙 (서비스 계층에서 검증)</h3>
+  <ul>
+    <li>참가 신청은 <b>모집중</b> 파티에만 가능하고, 내 파티와 이미 신청한 파티에는 신청할 수 없다.</li>
+    <li>승인은 정원에 여유가 있을 때만 가능하며, 승인 인원이 정원이 되면 파티가 자동으로 <b>인원마감</b>이 된다. 참가 취소·정원 변경으로 자리가 나면 다시 <b>모집중</b>이 된다.</li>
+    <li>리뷰는 <b>종료된</b> 파티에서, <b>승인된 참가자끼리</b>, 자기 자신을 제외하고, 같은 파티·같은 사람에게 한 번만 남길 수 있다.</li>
+    <li>리뷰를 남기면 받은 사람의 매너 점수(평균, 소수 첫째 자리)가 갱신되고, 리뷰·파티·회원이 삭제되면 남은 리뷰로 다시 계산한다.</li>
+    <li>관리자 기능(<code>/admin/**</code>)은 <code>ADMIN</code> 권한만 접근하며, 일반 회원은 403 으로 차단된다. 자기 자신과 마지막 관리자는 권한 변경·삭제할 수 없다.</li>
+  </ul>
+</section>
+
+<!-- ================= 3. 구조도 ================= -->
+<section class="land">
+  <h2>3. 시스템 구조도</h2>
+  <figure class="figure">
+    <img src="diagrams/system-architecture.svg" alt="GameParty 시스템 구조도">
+    <figcaption>브라우저 → Spring Security → Controller → Service → Repository/Entity → MySQL 의 계층 구조</figcaption>
+  </figure>
+</section>
+
+<!-- ================= 4. 흐름도 ================= -->
+<section class="tall">
+  <h2>4. 실행 흐름도</h2>
+  <figure class="figure">
+    <img src="diagrams/execution-flow.svg" alt="GameParty 실행 흐름도">
+    <figcaption>회원가입에서 파티 모집, 참가 신청과 승인, 파티 종료, 매너 리뷰, 점수 갱신까지의 흐름 (관리자 흐름 포함)</figcaption>
+  </figure>
+</section>
+
+<section class="land">
+  <h2>4-1. 상태 전이도</h2>
+  <figure class="figure">
+    <img src="diagrams/status-transitions.svg" alt="GameParty 상태 전이도">
+    <figcaption>파티 상태(모집중 · 인원마감 · 종료)와 참가 신청 상태(승인 대기 · 참가 중 · 거절됨)의 전이 조건</figcaption>
+  </figure>
+</section>
+
+<!-- ================= 5. 화면 ================= -->
+<section class="tall">
+  <h2>5. 화면 구성</h2>
+  <p class="sub">실제 실행 화면입니다. (시연용 더미 데이터 사용)</p>
+  <div class="shots">
+    <div class="shot"><h3>5-1. 메인 화면</h3><p>게임 이미지가 흐르는 첫 화면. 아래로 내리면 소개와 규칙이 이어진다.</p><img src="screenshots/01-main.png" alt="메인 화면"></div>
+    <div class="shot"><h3>5-2. 로그인</h3><p>Spring Security 폼 로그인.</p><img src="screenshots/02-login.png" alt="로그인"></div>
+    <div class="shot"><h3>5-3. 회원가입</h3><p>아이디·비밀번호·닉네임과 주 게임(3×3 선택 칸, 드래그·검색)을 입력한다.</p><img src="screenshots/03-signup.png" alt="회원가입"></div>
+    <div class="shot"><h3>5-4. 파티 찾기</h3><p>왼쪽 게임 목록으로 필터하고, 제목으로 검색한다. 한 페이지에 12개.</p><img src="screenshots/04-parties.png" alt="파티 찾기"></div>
+    <div class="shot"><h3>5-5. 파티 만들기</h3><p>게임 선택 칸(3×3, 드래그, 이름·장르·초성 검색)과 제목·인원·연락 링크를 입력한다.</p><img src="screenshots/05-party-create.png" alt="파티 만들기"></div>
+    <div class="shot"><h3>5-6. 참가 신청 (참가자 화면)</h3><p>모집중 파티에서 참가 신청을 하고, 오른쪽에서 다른 파티를 둘러볼 수 있다.</p><img src="screenshots/10-party-apply.png" alt="참가 신청"></div>
+    <div class="shot"><h3>5-7. 신청 승인 · 거절 (방장 화면)</h3><p>방장은 신청 대기 목록에서 승인 또는 거절한다. 정원이 차면 자동으로 인원마감이 된다.</p><img src="screenshots/09-party-host.png" alt="방장 화면"></div>
+    <div class="shot"><h3>5-8. 종료된 파티와 매너 리뷰</h3><p>종료된 파티에서 참가자끼리 별점과 한줄평을 남기고, 리뷰 목록이 보인다.</p><img src="screenshots/06-party-review.png" alt="매너 리뷰"></div>
+    <div class="shot"><h3>5-9. 마이페이지</h3><p>내가 만든 파티, 신청 현황, 받은 리뷰와 매너 점수를 모아 본다.</p><img src="screenshots/07-mypage.png" alt="마이페이지"></div>
+    <div class="shot"><h3>5-10. 내 정보 수정</h3><p>닉네임, 주 게임, 비밀번호(현재 비밀번호 확인 후)를 바꾼다.</p><img src="screenshots/08-mypage-edit.png" alt="내 정보 수정"></div>
+  </div>
+</section>
+
+<section class="tall">
+  <h2>6. 관리자 화면</h2>
+  <div class="shots">
+    <div class="shot"><h3>6-1. 대시보드</h3><p>회원·파티(상태별)·리뷰·게임 통계와 최근 가입 회원, 최근 파티.</p><img src="screenshots/11-admin-dashboard.png" alt="관리자 대시보드"></div>
+    <div class="shot"><h3>6-2. 회원 관리</h3><p>아이디·닉네임 검색, 정보 보기, 권한 부여, 삭제.</p><img src="screenshots/12-admin-members.png" alt="회원 관리"></div>
+    <div class="shot"><h3>6-3. 회원 정보</h3><p>가입 정보, 만든 파티, 신청한 파티, 받은 리뷰, 활동 요약과 정보 수정.</p><img src="screenshots/13-admin-member-detail.png" alt="회원 정보"></div>
+    <div class="shot"><h3>6-4. 파티 관리</h3><p>전체·모집중·인원마감·종료 버튼으로 상태별 보기, 강제 종료, 삭제.</p><img src="screenshots/14-admin-parties.png" alt="파티 관리"></div>
+    <div class="shot"><h3>6-5. 리뷰 관리</h3><p>모든 리뷰를 보고 삭제한다. 삭제하면 받은 사람의 매너 점수를 다시 계산한다.</p><img src="screenshots/15-admin-reviews.png" alt="리뷰 관리"></div>
+    <div class="shot"><h3>6-6. 확인창</h3><p>되돌릴 수 없는 작업 전에 사이트 디자인의 확인창을 띄운다.</p><img src="screenshots/16-confirm-dialog.png" alt="확인창"></div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
