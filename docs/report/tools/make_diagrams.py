@@ -89,7 +89,7 @@ def tag(x, y, s):
 
 # ---------------------------------------------------------------- ER 다이어그램
 def er():
-    W, H = 1240, 900
+    W, H = 1240, 960
     s = svg_open(W, H, "GameParty ER 다이어그램")
     s += text(40, 36, "GameParty ER 다이어그램", 22, "bold")
     s += text(40, 58, "JPA 엔티티 5개 · MySQL 테이블 기준", 13, "normal", MUTED)
@@ -122,6 +122,7 @@ def er():
         "party_member": dict(x=470, y=470, w=330, color="#2563eb", ko="참가 신청", rows=[
             ("PK", "id", "BIGINT"), ("FK", "party_id", "BIGINT → party"), ("FK", "member_id", "BIGINT → member"),
             ("", "status", "PENDING / APPROVED / REJECTED"), ("", "applied_at", "DATETIME"),
+            ("", "decided_at", "DATETIME · 승인/거절 시각"), ("", "result_seen", "BOOLEAN · 결과 확인 여부"),
             ("UK", "(party_id, member_id)", "복합 유니크")]),
         "party_review": dict(x=880, y=470, w=340, color="#db2777", ko="매너 리뷰", rows=[
             ("PK", "id", "BIGINT"), ("FK", "party_id", "BIGINT → party"), ("FK", "reviewer_id", "BIGINT → member"),
@@ -147,9 +148,9 @@ def er():
     ya, yb = anchor_y(P, 7), anchor_y(PR, 1)
     rel += poly([(800, ya), (840, ya), (840, yb), (880, yb)], arrow_end=False)
     # 6) member 1 : N party_review (작성자)
-    rel += poly([(180, 40 + HH + RH * 9), (180, 760), (1000, 760), (1000, 470 + HH + RH * 8)], arrow_end=False)
+    rel += poly([(180, 40 + HH + RH * 9), (180, 820), (1000, 820), (1000, 470 + HH + RH * 8)], arrow_end=False)
     # 7) member 1 : N party_review (받는 사람)
-    rel += poly([(120, 40 + HH + RH * 9), (120, 800), (1100, 800), (1100, 470 + HH + RH * 8)], arrow_end=False)
+    rel += poly([(120, 40 + HH + RH * 9), (120, 860), (1100, 860), (1100, 470 + HH + RH * 8)], arrow_end=False)
     s += rel
 
     # 표
@@ -179,14 +180,14 @@ def er():
     s += tag(648, 330, "1") + tag(648, 462, "N") + label(635, 400, "참가 신청", 12)
     s += tag(262, 330, "1") + tag(452, 565, "N") + label(250, 450, "신청자", 12)
     s += tag(812, 265, "1") + tag(868, 539, "N") + label(840, 410, "파티 리뷰", 12)
-    s += tag(194, 330, "1") + tag(1013, 735, "N") + label(590, 754, "리뷰 작성자 (reviewer)", 12)
-    s += tag(134, 330, "1") + tag(1113, 735, "N") + label(590, 794, "리뷰 받는 사람 (target)", 12)
+    s += tag(194, 330, "1") + tag(1013, 735, "N") + label(590, 814, "리뷰 작성자 (reviewer)", 12)
+    s += tag(134, 330, "1") + tag(1113, 735, "N") + label(590, 854, "리뷰 받는 사람 (target)", 12)
 
     # 참고
-    s += '<g transform="translate(470,680)">\n'
+    s += '<g transform="translate(470,730)">\n'
     s += rbox(0, 0, 330, 56, "#f8fafc", BORDER, 1.2, 8)
     s += text(12, 22, "party_member : member 와 party 의 N:M 을 푼 연결 테이블", 11, "normal", MUTED)
-    s += text(12, 42, "방장도 '참가 중'으로 함께 등록 (리뷰 대상에 포함)", 11, "normal", MUTED)
+    s += text(12, 42, "방장도 '참가 중'으로 함께 등록 (리뷰 대상에 포함, 알림 없음)", 11, "normal", MUTED)
     s += '</g>\n</g>\n</svg>\n'
     return s
 
@@ -224,14 +225,14 @@ def arch():
 
     L = [
         (80, 84, "#475569", "사용자 브라우저", "HTML · CSS · JS",
-         ["메인", "로그인 · 회원가입", "파티 찾기 · 상세 · 만들기", "마이페이지 · 내 정보 수정", "관리자 페이지", "확인창 · 게임 선택(드래그/검색)"]),
+         ["메인", "로그인 · 회원가입", "파티 찾기 · 상세 · 만들기", "마이페이지 · 새 소식 · 정보 수정 · 탈퇴", "관리자 페이지", "확인창 · 게임 선택 · 화이트 모드"]),
         (200, 84, "#b45309", "보안 계층", "Spring Security",
          ["폼 로그인 (세션)", "BCrypt 비밀번호", "CSRF 토큰", "ROLE_USER / ROLE_ADMIN", "/admin/** = ADMIN만"]),
         (320, 112, "#7c3aed", "Controller", "Spring MVC",
-         ["HomeController", "MemberController", "PartyController", "MyPageController", "AdminController"]),
+         ["HomeController", "MemberController", "PartyController", "MyPageController", "AdminController", "NotificationAdvice"]),
         (468, 126, "#2563eb", "Service", "비즈니스 로직 · 트랜잭션",
          ["MemberService", "PartyService", "ParticipationService", "ReviewService", "MyPageService", "AdminService",
-          "MemberEditValidator"]),
+          "NotificationService", "WithdrawalService", "MemberEditValidator"]),
         (630, 112, "#0d9488", "Repository · Entity", "Spring Data JPA · Hibernate",
          ["MemberRepository", "GameRepository", "PartyRepository", "PartyMemberRepository", "PartyReviewRepository",
           "Entity 5개 + enum 3개"]),
@@ -273,6 +274,7 @@ def arch():
         "• 승인 인원에 따라 모집중↔인원마감 전환",
         "• 종료된 파티에서만 참가자끼리 1회 리뷰",
         "• 리뷰·회원·파티 삭제 시 점수 재계산",
+        "• 알림은 신청 내역에서 계산 (테이블 없음)",
         "• 공용 검증기로 수정 규칙 통일",
         "• 규칙은 서버에서 검증",
         "• 관리자 비밀번호는 Git 제외 파일에 보관"], "#0d9488")
@@ -299,9 +301,9 @@ def flow():
         (1, "A", 120, "1", "회원가입", "/signup · 아이디 · 비밀번호 · 닉네임", "주 게임 선택(드래그/검색) · BCrypt 저장"),
         (2, "A", 225, "2", "로그인", "/login · Spring Security 세션", "관리자는 ADMIN 권한으로 로그인"),
         (3, "B", 330, "3", "파티 만들기", "/parties/new · 게임 · 제목 · 인원", "방장은 '참가 중'으로 자동 등록"),
-        (4, "A", 435, "4", "파티 찾기", "/parties · 게임별 필터 · 제목 검색", "12개씩 페이지 · 상세에서 다른 파티도 탐색"),
-        (5, "A", 540, "5", "참가 신청", "모집중 파티에만 · 상태 '승인 대기'", "중복 신청 · 내 파티 신청 불가"),
-        (6, "B", 645, "6", "신청 승인 / 거절", "정원이 차면 자동 '인원마감'", "정원 동시 변경은 비관적 락으로 보호"),
+        (4, "A", 435, "4", "파티 찾기", "/parties · 게임 · 제목 · 모집중만 보기", "정렬(최신/자리/마감 임박) · 12개씩 페이지"),
+        (5, "A", 540, "5", "참가 신청", "모집중 파티에만 · 상태 '승인 대기'", "방장에게 '새 소식' 알림 · 중복 신청 불가"),
+        (6, "B", 645, "6", "신청 승인 / 거절", "신청자에게 '새 소식'(승인/거절) 알림", "정원이 차면 자동 마감 · 비관적 락 보호"),
         (7, "B", 750, "7", "파티 종료", "수정 · 삭제 · 신청 처리 잠금", "참가자끼리 리뷰 작성 가능해짐"),
         (8, "A", 855, "8", "매너 리뷰 작성", "별점 1~5 + 한줄평 · 본인 제외", "같은 파티 · 같은 사람에게 1회"),
         (9, "C", 960, "9", "매너 점수 갱신", "받은 리뷰 평균(소수 1자리)", "목록 · 상세 · 마이페이지에 표시"),
@@ -347,7 +349,7 @@ def flow():
     s += poly([(cx["C"], 330 + BH), (cx["C"], 435)])
     # 관리자 삭제 -> 점수 재계산 (점선)
     s += poly([(cx["C"] + 100, 435 + BH), (cx["C"] + 100, 960)], color="#dc2626", dashed=True, marker="arrD")
-    s += label(cx["C"] + 100, 700, "삭제 시 점수 재계산", 12, "middle", "#dc2626")
+    s += label(cx["C"] + 100, 700, "삭제·탈퇴 시 점수 재계산", 12, "middle", "#dc2626")
     # 로그인 -> 관리자 로그인 (참고선)
     s += poly([(340, 266), (780, 266)], color="#94a3b8", dashed=True)
     s += label(560, 258, "관리자 계정으로 로그인", 11, "middle", MUTED)

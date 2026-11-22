@@ -37,20 +37,20 @@
 <circle cx="84" cy="461" r="14" fill="#2563eb"/>
 <text x="84" y="466" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle" >4</text>
 <text x="108" y="466" font-size="16" font-weight="bold" fill="#1f2430" text-anchor="start" >파티 찾기</text>
-<text x="74" y="491" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >/parties · 게임별 필터 · 제목 검색</text>
-<text x="74" y="509" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="start" >12개씩 페이지 · 상세에서 다른 파티도 탐색</text>
+<text x="74" y="491" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >/parties · 게임 · 제목 · 모집중만 보기</text>
+<text x="74" y="509" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="start" >정렬(최신/자리/마감 임박) · 12개씩 페이지</text>
 <rect x="60" y="540" width="280" height="82" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
 <circle cx="84" cy="566" r="14" fill="#2563eb"/>
 <text x="84" y="571" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle" >5</text>
 <text x="108" y="571" font-size="16" font-weight="bold" fill="#1f2430" text-anchor="start" >참가 신청</text>
 <text x="74" y="596" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >모집중 파티에만 · 상태 '승인 대기'</text>
-<text x="74" y="614" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="start" >중복 신청 · 내 파티 신청 불가</text>
+<text x="74" y="614" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="start" >방장에게 '새 소식' 알림 · 중복 신청 불가</text>
 <rect x="420" y="645" width="280" height="82" rx="12" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
 <circle cx="444" cy="671" r="14" fill="#7c3aed"/>
 <text x="444" y="676" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle" >6</text>
 <text x="468" y="676" font-size="16" font-weight="bold" fill="#1f2430" text-anchor="start" >신청 승인 / 거절</text>
-<text x="434" y="701" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >정원이 차면 자동 '인원마감'</text>
-<text x="434" y="719" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="start" >정원 동시 변경은 비관적 락으로 보호</text>
+<text x="434" y="701" font-size="12" font-weight="normal" fill="#1f2430" text-anchor="start" >신청자에게 '새 소식'(승인/거절) 알림</text>
+<text x="434" y="719" font-size="11.5" font-weight="normal" fill="#667085" text-anchor="start" >정원이 차면 자동 마감 · 비관적 락 보호</text>
 <rect x="420" y="750" width="280" height="82" rx="12" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
 <circle cx="444" cy="776" r="14" fill="#7c3aed"/>
 <text x="444" y="781" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle" >7</text>
@@ -98,8 +98,8 @@
 <polyline points="920,307 920,330" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
 <polyline points="920,412 920,435" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arr)"/>
 <polyline points="1020,517 1020,960" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrD)"/>
-<rect x="958" y="687" width="124" height="19" rx="3" fill="#ffffff" opacity="0.92"/>
-<text x="1020" y="700" font-size="12" font-weight="bold" fill="#dc2626" text-anchor="middle" >삭제 시 점수 재계산</text>
+<rect x="943" y="687" width="154" height="19" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="1020" y="700" font-size="12" font-weight="bold" fill="#dc2626" text-anchor="middle" >삭제·탈퇴 시 점수 재계산</text>
 <polyline points="340,266 780,266" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arr)"/>
 <rect x="493" y="246" width="134" height="18" rx="3" fill="#ffffff" opacity="0.92"/>
 <text x="560" y="258" font-size="11" font-weight="bold" fill="#667085" text-anchor="middle" >관리자 계정으로 로그인</text>

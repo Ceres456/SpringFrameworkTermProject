@@ -132,6 +132,8 @@ try {
   if (-not $Quick) { Shot "02-login" "/login" $false }
   Shot "03-signup" "/signup" $true
   Shot "04-parties" "/parties" $true 1200
+  Shot "17-parties-filter" "/parties?open=true&sort=ending" $true 1200
+  Shot "21-error-404" "/no-such-page" $false 800
 
   # ---------------- member (dummy01) ----------------
   Login "dummy01" "dummy1234!"
@@ -144,6 +146,7 @@ try {
   Shot "06-party-review" "/parties/33" $true 1000
   Shot "07-mypage" "/mypage" $true 1000
   if (-not $Quick) { Shot "08-mypage-edit" "/mypage/edit" $true 1200 }
+  if (-not $Quick) { Shot "20-mypage-withdraw" "/mypage/withdraw" $true 800 }
 
   # pending application so the host screen shows approve / reject (restored afterwards)
   if ($hostedId -and -not $Quick) {
@@ -157,6 +160,36 @@ try {
     Write-Output ("dummy12 cancel status (restore): " + $st)
     # applicant view of an open party
     Shot "10-party-apply" "/parties/$hostedId" $true 1000
+  }
+
+  # ---------------- notifications (a temporary account applies, the host approves; everything is undone afterwards) ----------------
+  if ($hostedId -and -not $Quick) {
+    $guest = "shotguest"
+    $guestPw = "Shot1234x"
+    Cdp "Network.clearBrowserCookies" | Out-Null
+    Go ($Base + "/signup") 300
+    $st = PostForm "/signup" "/signup" "{username:'$guest',password:'$guestPw',passwordConfirm:'$guestPw',nickname:'shotguest'}"
+    Write-Output ("shotguest signup status: " + $st)
+    Login $guest $guestPw
+    $st = PostForm "/parties/$hostedId/apply" "/parties/$hostedId"
+    Write-Output ("shotguest apply status: " + $st)
+    # host side: the new application shows up under the news panel and the header badge
+    Login "dummy01" "dummy1234!"
+    Shot "18-mypage-news-host" "/mypage" $true 1000
+    Go ($Base + "/parties/$hostedId") 300
+    $appId = EvalJson "(() => { const f = [...document.querySelectorAll('form[action$=""/approve""]')].find(x => x.closest('li').textContent.includes('shotguest')); return f ? f.getAttribute('action').split('/').slice(-2)[0] : ''; })()"
+    Write-Output ("shotguest application id: " + $appId)
+    if ($appId) {
+      $st = PostForm "/parties/$hostedId/applications/$appId/approve" "/parties/$hostedId"
+      Write-Output ("approve status: " + $st)
+      # applicant side: the result shows up
+      Login $guest $guestPw
+      Shot "19-mypage-news-applicant" "/mypage" $true 1000
+      $st = PostForm "/parties/$hostedId/cancel" "/parties/$hostedId"
+      Write-Output ("shotguest cancel status (restore): " + $st)
+    }
+    $st = PostForm "/mypage/withdraw" "/mypage/withdraw" "{password:'$guestPw'}"
+    Write-Output ("shotguest withdraw status (cleanup): " + $st)
   }
 
   # ---------------- admin ----------------
