@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <header class="nav" th:fragment="header">
-    <a class="logo" th:href="@{/parties}">GameParty</a>
+    <a class="logo" th:href="@{/parties}">GP.Hub</a>
     <nav>
         <a th:href="@{/parties}">파티 찾기</a>
         <a class="nav-cta" th:href="@{/parties/new}" sec:authorize="isAuthenticated()">파티 만들기</a>

@@ -116,7 +116,7 @@ header.nav {
 }
 header.nav .logo {
     font-family: var(--font-display);
-    font-size: 1.7rem; line-height: 1.02; letter-spacing: 0; text-transform: uppercase;
+    font-size: 1.7rem; line-height: 1.02; letter-spacing: 0; text-transform: none;
     color: var(--color-ink); text-decoration: none; white-space: nowrap;
     text-shadow: 2px 0 var(--color-crt-r), -2px 0 var(--color-crt-c);
 }
@@ -736,7 +736,7 @@ body.modal-open { overflow: hidden; }
     content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--screen-grille); opacity: .5;
 }
 .modal > * { position: relative; z-index: 1; }
-.modal-kicker { margin: 0 0 6px; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-accent-2); }
+.modal-kicker { margin: 0 0 6px; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: none; color: var(--color-accent-2); }
 .modal.danger .modal-kicker { color: var(--color-crt-r); }
 .modal-title { margin: 0; font-size: 1.25rem; line-height: 1.35; overflow-wrap: anywhere; }
 .modal-desc { margin: 10px 0 0; color: var(--color-ink-2); line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }

@@ -21,7 +21,7 @@
         backdrop.hidden = true;
         backdrop.innerHTML =
             '<div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">' +
-            '  <p class="modal-kicker">GameParty</p>' +
+            '  <p class="modal-kicker">GP.Hub</p>' +
             '  <h3 class="modal-title" id="modal-title"></h3>' +
             '  <p class="modal-desc" id="modal-desc"></p>' +
             '  <div class="modal-actions">' +
