@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>마이페이지 - GameParty</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
 <main>
     <h2>마이페이지</h2>
+
+    <div class="notice ok" th:if="${message}" th:text="${message}"></div>
+    <div class="notice fail" th:if="${error}" th:text="${error}"></div>
 
     <!-- 내 정보 -->
     <section class="panel profile">
@@ -17,19 +21,55 @@
             <div>
                 <div class="profile-name" th:text="${me.nickname}">닉네임</div>
                 <div class="sub" th:text="'@' + ${me.username}"></div>
+                <a class="btn small ghost edit-profile-btn" th:href="@{/mypage/edit}">내 정보 수정</a>
+                <a class="withdraw-link" th:href="@{/mypage/withdraw}" sec:authorize="!hasRole('ADMIN')">회원 탈퇴</a>
             </div>
             <div class="score">
                 <span class="score-num" th:if="${me.reviewCount > 0}" th:text="${me.mannerScore}"></span>
                 <span class="score-num none" th:unless="${me.reviewCount > 0}">-</span>
-                <span class="sub" th:text="'매너 점수 · ' + ${me.reviewCount} + '명 평가'"></span>
+                <span class="sub" th:text="'매너 점수 (' + ${me.reviewCount} + '명 평가)'"></span>
             </div>
         </div>
         <dl class="info">
             <dt>주 게임</dt>
-            <dd th:text="${me.mainGame != null and !me.mainGame.isEmpty()} ? ${me.mainGame} : '등록하지 않음'"></dd>
+            <dd>
+                <span th:text="${me.mainGame != null and !me.mainGame.isEmpty()} ? ${me.mainGame} : '등록하지 않음'"></span>
+                <a class="mini-link" th:href="@{/mypage/edit}">변경</a>
+            </dd>
             <dt>가입일</dt>
             <dd th:text="${#temporals.format(me.joinedAt, 'yyyy-MM-dd')}"></dd>
         </dl>
+    </section>
+
+    <!-- 새 소식: 내 신청 결과 + 내 파티에 들어온 신청 -->
+    <section class="panel section" id="news">
+        <h3 th:text="'새 소식 (' + ${notices.size()} + ')'">새 소식</h3>
+        <p class="hint" th:if="${notices.isEmpty()}">새 소식이 없어요.</p>
+        <ul class="news-list" th:unless="${notices.isEmpty()}">
+            <li th:each="n : ${notices}">
+                <span class="news-tag approved" th:if="${n.kind.name() == 'APPROVED'}">승인</span>
+                <span class="news-tag rejected" th:if="${n.kind.name() == 'REJECTED'}">거절</span>
+                <span class="news-tag pending" th:if="${n.kind.name() == 'INCOMING'}">신청</span>
+                <span class="news-text">
+                    <th:block th:if="${n.kind.name() == 'INCOMING'}">
+                        <b th:text="${n.applicantNickname}"></b>님이
+                        <a th:href="@{/parties/{id}(id=${n.partyId})}" th:text="${n.partyTitle}"></a>
+                        파티에 참가를 신청했어요. 파티에서 승인하거나 거절해 주세요.
+                    </th:block>
+                    <th:block th:unless="${n.kind.name() == 'INCOMING'}">
+                        <a th:href="@{/parties/{id}(id=${n.partyId})}" th:text="${n.partyTitle}"></a>
+                        <span th:text="${n.kind.name() == 'APPROVED'} ? '파티 참가가 승인됐어요.' : '파티 참가 신청이 거절됐어요.'"></span>
+                    </th:block>
+                </span>
+                <span class="news-time" th:if="${n.occurredAt != null}"
+                      th:text="${#temporals.format(n.occurredAt, 'MM-dd HH:mm')}"></span>
+            </li>
+        </ul>
+        <div class="news-actions" th:if="${!notices.?[kind.name() != 'INCOMING'].isEmpty()}">
+            <form th:action="@{/mypage/notifications/read}" method="post">
+                <button type="submit" class="btn small ghost">결과 알림 모두 읽음</button>
+            </form>
+        </div>
     </section>
 
     <!-- 내가 만든 파티 -->
@@ -106,7 +146,7 @@
                 <span class="sub" th:if="${r.comment != null}" th:text="${r.comment}"></span>
                 <span class="sub meta">
                     <a th:href="@{/parties/{id}(id=${r.partyId})}" th:text="${r.partyTitle}"></a>
-                    · <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></span>
+                    <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></span>
                 </span>
             </li>
         </ul>

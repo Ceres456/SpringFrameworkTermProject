@@ -67,6 +67,32 @@ public class Member {
         this.createdAt = LocalDateTime.now();
     }
 
+    /** 주로 하는 게임을 바꾼다. null 이면 등록하지 않은 상태로 돌린다. */
+    public void changeMainGame(String mainGame) {
+        this.mainGame = mainGame;
+    }
+
+    /** 닉네임을 바꾼다. */
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    /** 암호화된 비밀번호로 바꾼다. (관리자 계정을 설정 파일의 비밀번호에 맞출 때 쓴다) */
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    /** 관리자 기능: 권한을 바꾼다. */
+    public void changeRole(Role role) {
+        this.role = role;
+    }
+
+    /** 리뷰가 지워졌을 때 남은 리뷰 기준으로 매너 점수를 다시 정한다. */
+    public void resetReviewStats(double mannerScore, int reviewCount) {
+        this.mannerScore = mannerScore;
+        this.reviewCount = reviewCount;
+    }
+
     /** 리뷰 1건이 등록될 때 평균 매너 점수를 갱신한다. */
     public void applyReview(int rating) {
         double total = this.mannerScore * this.reviewCount + rating;

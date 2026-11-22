@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${party.title} + ' - GameParty'">파티 상세 - GameParty</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
-<main>
+<main class="detail-page">
+<div class="detail-layout">
+<div class="detail-main">
     <div class="notice ok" th:if="${message}" th:text="${message}"></div>
     <div class="notice fail" th:if="${error}" th:text="${error}"></div>
 
@@ -54,19 +57,19 @@
                 참가하려면 <a th:href="@{/login}">로그인</a>이 필요해요.
             </p>
             <p th:if="${party.myStatus != null and party.myStatus.name() == 'PENDING'}" class="hint">
-                ⏳ 신청했어요. 방장의 승인을 기다리는 중입니다.
+                신청했어요. 방장의 승인을 기다리는 중입니다.
             </p>
             <p th:if="${party.myStatus != null and party.myStatus.name() == 'APPROVED'}" class="hint ok-text">
-                ✅ 참가가 승인되었어요. 연락 링크로 합류하세요!
+                참가가 승인되었어요. 연락 링크로 합류하세요!
             </p>
             <p th:if="${party.myStatus != null and party.myStatus.name() == 'REJECTED'}" class="hint warn-text">
-                ❌ 이번 신청은 거절되었어요.
+                이번 신청은 거절되었어요.
             </p>
             <p th:if="${party.myStatus == null and !party.canApply and party.status.name() != 'RECRUITING'}" class="hint">
                 모집이 마감된 파티입니다.
             </p>
             <form th:if="${party.canCancel}" th:action="@{/parties/{id}/cancel(id=${party.id})}" method="post"
-                  onsubmit="return confirm('참가 신청을 취소할까요?');">
+                  data-confirm="참가 신청을 취소할까요?" data-confirm-ok="신청 취소">
                 <button type="submit" class="btn small ghost">신청 취소</button>
             </form>
         </div>
@@ -76,11 +79,13 @@
             <th:block th:if="${party.canClose}">
                 <a class="btn small" th:href="@{/parties/{id}/edit(id=${party.id})}">수정</a>
                 <form th:action="@{/parties/{id}/close(id=${party.id})}" method="post" style="display:inline"
-                      onsubmit="return confirm('파티를 종료할까요? 종료하면 수정·삭제·신청 처리가 막히고, 참가자끼리 리뷰를 남길 수 있어요.');">
+                      data-confirm="파티를 종료할까요?&#10;종료하면 수정, 삭제, 신청 처리가 막히고, 참가자끼리 리뷰를 남길 수 있어요."
+                      data-confirm-ok="파티 종료">
                     <button type="submit" class="btn small ghost">파티 종료</button>
                 </form>
                 <form th:action="@{/parties/{id}/delete(id=${party.id})}" method="post" style="display:inline"
-                      onsubmit="return confirm('이 파티를 삭제할까요? 되돌릴 수 없습니다.');">
+                      data-confirm="이 파티를 삭제할까요?&#10;삭제하면 되돌릴 수 없습니다."
+                      data-confirm-ok="삭제" data-confirm-tone="danger">
                     <button type="submit" class="btn small danger">삭제</button>
                 </form>
             </th:block>
@@ -148,12 +153,39 @@
         <p class="hint" th:if="${party.reviews.isEmpty()}">아직 남겨진 리뷰가 없습니다.</p>
         <ul class="members">
             <li th:each="r : ${party.reviews}">
-                <span class="nick" th:text="${r.reviewerNickname} + ' → ' + ${r.targetNickname}"></span>
+                <span class="nick" th:text="${r.reviewerNickname} + '님이 ' + ${r.targetNickname} + '님에게'"></span>
                 <span class="stars" th:text="${#strings.repeat('★', r.rating)} + ' ' + ${r.rating} + '점'"></span>
                 <span class="sub" th:if="${r.comment != null}" th:text="${r.comment}"></span>
             </li>
         </ul>
     </section>
+</div>
+
+<!-- 오른쪽: 파티 찾기 (게임 / 제목 / 모집 인원만). 8개씩 최대 3페이지, ‹ › 로 넘긴다 (js/other-parties.js) -->
+<aside class="other-parties" aria-label="파티 찾기">
+    <section class="panel">
+        <h3>파티 찾기 <a class="mini-link" th:href="@{/parties}">전체 보기</a></h3>
+        <p class="hint" th:if="${otherParties.isEmpty()}">지금 모집 중인 다른 파티가 없어요.</p>
+        <ul class="other-list" data-other-list th:unless="${otherParties.isEmpty()}">
+            <li th:each="o : ${otherParties}">
+                <a th:href="@{/parties/{id}(id=${o.id})}">
+                    <span class="og-top">
+                        <span class="og-game" th:text="${o.gameName}"></span>
+                        <span class="og-count" th:text="${o.currentMembers} + ' / ' + ${o.maxMembers} + '명'"></span>
+                    </span>
+                    <span class="og-title" th:text="${o.title}"></span>
+                </a>
+            </li>
+        </ul>
+        <div class="other-pager" hidden>
+            <button type="button" class="picker-btn" data-dir="-1" aria-label="이전 파티들">‹</button>
+            <span class="other-count" aria-live="polite"></span>
+            <button type="button" class="picker-btn" data-dir="1" aria-label="다음 파티들">›</button>
+        </div>
+    </section>
+</aside>
+</div>
 </main>
+<script th:src="@{/js/other-parties.js}" defer></script>
 </body>
 </html>

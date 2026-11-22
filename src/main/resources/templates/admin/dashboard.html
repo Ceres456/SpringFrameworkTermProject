@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>관리자 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main class="admin-page">
+    <h2>관리자 페이지</h2>
+    <nav th:replace="~{fragments/admin-nav :: nav('dashboard')}"></nav>
+
+    <section class="stat-grid" aria-label="전체 통계">
+        <div class="stat">
+            <span class="stat-num" th:text="${stats.memberCount}">0</span>
+            <span class="stat-label">회원</span>
+            <span class="stat-sub" th:text="'관리자 ' + ${stats.adminCount} + '명'"></span>
+        </div>
+        <div class="stat">
+            <span class="stat-num" th:text="${stats.partyCount}">0</span>
+            <span class="stat-label">파티</span>
+            <span class="stat-sub"
+                  th:text="'모집중 ' + ${stats.recruitingCount} + ' · 인원마감 ' + ${stats.fullCount} + ' · 종료 ' + ${stats.closedCount}"></span>
+        </div>
+        <div class="stat">
+            <span class="stat-num" th:text="${stats.reviewCount}">0</span>
+            <span class="stat-label">리뷰</span>
+            <span class="stat-sub">파티원끼리 남긴 매너 평가</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num" th:text="${stats.gameCount}">0</span>
+            <span class="stat-label">게임</span>
+            <span class="stat-sub">등록된 게임</span>
+        </div>
+    </section>
+
+    <div class="admin-two">
+        <section class="panel section">
+            <h3>최근 가입 회원 <a class="mini-link" th:href="@{/admin/members}">전체 보기</a></h3>
+            <div class="table-wrap"><table class="admin-table compact">
+                <thead><tr><th>닉네임</th><th>아이디</th><th>권한</th><th>가입일</th></tr></thead>
+                <tbody>
+                <tr th:each="m : ${recentMembers}">
+                    <td th:text="${m.nickname}"></td>
+                    <td th:text="${m.username}"></td>
+                    <td><span class="role-badge" th:classappend="${m.role.name() == 'ADMIN'} ? 'admin'"
+                              th:text="${m.role.name() == 'ADMIN'} ? '관리자' : '회원'"></span></td>
+                    <td th:text="${#temporals.format(m.createdAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table></div>
+        </section>
+
+        <section class="panel section">
+            <h3>최근 파티 <a class="mini-link" th:href="@{/admin/parties}">전체 보기</a></h3>
+            <div class="table-wrap"><table class="admin-table compact">
+                <thead><tr><th>게임</th><th>제목</th><th>상태</th><th>작성일</th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${recentParties}">
+                    <td th:text="${p.gameName}"></td>
+                    <td class="wrap"><a th:href="@{/parties/{id}(id=${p.id})}" th:text="${p.title}"></a></td>
+                    <td th:text="${p.status.label}"></td>
+                    <td th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table></div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

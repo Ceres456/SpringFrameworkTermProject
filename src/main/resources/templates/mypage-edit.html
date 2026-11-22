@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>내 정보 수정 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main>
+    <div class="card wide">
+        <h2>내 정보 수정</h2>
+        <dl class="info">
+            <dt>아이디</dt>
+            <dd th:text="${username}"></dd>
+            <dt>가입일</dt>
+            <dd th:text="${#temporals.format(joinedAt, 'yyyy-MM-dd')}"></dd>
+        </dl>
+        <p class="sub">아이디와 가입일은 바꿀 수 없어요.</p>
+
+        <form th:action="@{/mypage/edit}" th:object="${memberEditForm}" method="post">
+            <div th:replace="~{fragments/member-edit-fields :: fields(${games}, true)}"></div>
+
+            <div class="actions">
+                <button type="submit" class="btn">저장</button>
+                <a class="btn ghost" th:href="@{/mypage}">취소</a>
+            </div>
+        </form>
+    </div>
+</main>
+<script th:src="@{/js/game-picker.js}" defer></script>
+</body>
+</html>

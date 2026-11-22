@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  게임 선택 칸 (파티 만들기 / 회원가입 공용).
+  한 화면에 3 x 3, 옆으로 드래그하거나 화살표를 누르면 다음 게임 9개. 이름·장르·초성으로 검색. (js/game-picker.js)
+
+  인자
+    games      : 게임 목록
+    field      : 라디오 버튼의 name (폼 필드 이름)
+    byName     : true 면 값으로 게임 이름을, false 면 게임 번호(id)를 보낸다
+    selected   : 지금 선택돼 있는 값 (없으면 null)
+    label      : 칸 위에 붙일 제목
+    clearable  : true 면 "선택 안 함" 버튼을 보여 준다 (선택 항목일 때)
+-->
+<div th:fragment="picker(games, field, byName, selected, label, clearable)">
+    <div class="picker-bar">
+        <span class="field-label" th:text="${label}">게임 선택</span>
+        <span class="picker-nav" hidden>
+            <span class="picker-hint">드래그해서 더 보기</span>
+            <button type="button" class="picker-btn" data-dir="-1" aria-label="이전 게임들">‹</button>
+            <span class="picker-dots" aria-hidden="true"></span>
+            <span class="picker-count" aria-live="polite"></span>
+            <button type="button" class="picker-btn" data-dir="1" aria-label="다음 게임들">›</button>
+        </span>
+    </div>
+    <input type="search" class="picker-search" placeholder="게임 검색 (이름·장르·초성 — 예: 발로, ㅂㄹㄹㅌ, FPS)"
+           aria-label="게임 검색" autocomplete="off" hidden>
+    <div class="picker-status-row">
+        <p class="picker-status" aria-live="polite" hidden></p>
+        <button type="button" class="picker-clear" th:if="${clearable}" data-picker-clear hidden>선택 안 함</button>
+    </div>
+    <div class="game-picker" data-game-picker>
+        <div class="game-grid">
+            <label class="game-card" th:each="g : ${games}"
+                   th:attr="data-name=${g.name}, data-genre=${g.genre}"
+                   th:with="val=${byName} ? ${g.name} : ${#strings.toString(g.id)}">
+                <input type="radio" th:name="${field}" th:value="${val}"
+                       th:checked="${selected != null and #strings.toString(selected) == val}">
+                <span class="thumb" th:style="'--h:' + ${(g.id * 47) % 360}">
+                    <img th:if="${g.slug != null}" th:src="@{/images/games/{s}.jpg(s=${g.slug})}"
+                         alt="" draggable="false" decoding="async" onerror="this.remove()">
+                    <span class="thumb-name" th:text="${g.name}"></span>
+                    <span class="check">✓</span>
+                </span>
+            </label>
+        </div>
+    </div>
+</div>
+</body>
+</html>

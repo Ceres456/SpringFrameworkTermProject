@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${member.nickname} + ' - 회원 정보 - GameParty'">회원 정보 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main class="admin-page">
+    <h2>관리자 페이지</h2>
+    <nav th:replace="~{fragments/admin-nav :: nav('members')}"></nav>
+
+    <div class="notice ok" th:if="${message}" th:text="${message}"></div>
+    <div class="notice fail" th:if="${error}" th:text="${error}"></div>
+
+    <p><a class="mini-link back-link" th:href="@{/admin/members}">← 회원 목록</a></p>
+
+    <!-- 기본 정보 -->
+    <section class="panel profile">
+        <div class="profile-main">
+            <div>
+                <div class="profile-name">
+                    <span th:text="${member.nickname}">닉네임</span>
+                    <span class="role-badge" th:classappend="${member.role.name() == 'ADMIN'} ? 'admin'"
+                          th:text="${member.role.name() == 'ADMIN'} ? '관리자' : '회원'"></span>
+                </div>
+                <div class="sub" th:text="'@' + ${member.username}"></div>
+            </div>
+            <div class="score">
+                <span class="score-num" th:if="${member.reviewCount > 0}" th:text="${member.mannerScore}"></span>
+                <span class="score-num none" th:unless="${member.reviewCount > 0}">-</span>
+                <span class="sub" th:text="'매너 점수 (' + ${member.reviewCount} + '명 평가)'"></span>
+            </div>
+        </div>
+        <dl class="info">
+            <dt>회원 번호</dt>
+            <dd th:text="${member.id}"></dd>
+            <dt>주 게임</dt>
+            <dd th:text="${member.mainGame != null and !member.mainGame.isEmpty()} ? ${member.mainGame} : '등록하지 않음'"></dd>
+            <dt>가입일</dt>
+            <dd th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd HH:mm')}"></dd>
+            <dt>활동</dt>
+            <dd th:text="'만든 파티 ' + ${profile.hostedParties.size()} + '개 · 신청한 파티 ' + ${profile.applications.size()} + '개 · 받은 리뷰 ' + ${member.reviewCount} + '개 · 남긴 리뷰 ' + ${writtenCount} + '개'"></dd>
+        </dl>
+
+        <div class="actions">
+            <a class="btn small" th:href="@{/admin/members/{id}/edit(id=${member.id})}">정보 수정</a>
+            <th:block th:unless="${self}">
+            <form th:action="@{/admin/members/{id}/role(id=${member.id})}" method="post"
+                  th:if="${member.role.name() != 'ADMIN'}"
+                  data-confirm="이 회원을 관리자로 올릴까요?&#10;관리자는 모든 회원, 파티, 리뷰를 관리할 수 있어요." data-confirm-ok="권한 부여">
+                <input type="hidden" name="role" value="ADMIN">
+                <input type="hidden" name="back" value="detail">
+                <button type="submit" class="btn small ghost">권한 부여</button>
+            </form>
+            <form th:action="@{/admin/members/{id}/role(id=${member.id})}" method="post"
+                  th:unless="${member.role.name() != 'ADMIN'}"
+                  data-confirm="이 관리자를 일반 회원으로 내릴까요?&#10;더 이상 관리자 페이지에 들어올 수 없어요." data-confirm-ok="회원으로 내리기">
+                <input type="hidden" name="role" value="USER">
+                <input type="hidden" name="back" value="detail">
+                <button type="submit" class="btn small ghost">회원으로</button>
+            </form>
+            <form th:action="@{/admin/members/{id}/delete(id=${member.id})}" method="post"
+                  data-confirm="이 회원을 삭제할까요?&#10;만든 파티, 참가 내역, 남긴/받은 리뷰도 함께 삭제되며 되돌릴 수 없습니다."
+                  data-confirm-ok="삭제" data-confirm-tone="danger">
+                <button type="submit" class="btn small danger" th:disabled="${member.role.name() == 'ADMIN'}">회원 삭제</button>
+            </form>
+            </th:block>
+        </div>
+        <p class="sub" th:if="${self}">내 계정입니다. 내 권한은 바꾸거나 삭제할 수 없어요.</p>
+    </section>
+
+    <!-- 만든 파티 -->
+    <section class="panel section">
+        <h3 th:text="'만든 파티 (' + ${profile.hostedParties.size()} + ')'">만든 파티</h3>
+        <p class="hint" th:if="${profile.hostedParties.isEmpty()}">만든 파티가 없어요.</p>
+        <div class="table-wrap" th:unless="${profile.hostedParties.isEmpty()}">
+            <table class="admin-table">
+                <thead>
+                <tr><th>게임</th><th>제목</th><th>인원</th><th>상태</th><th>신청 대기</th><th>작성일</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${profile.hostedParties}">
+                    <td th:text="${p.gameName}"></td>
+                    <td class="wrap"><a th:href="@{/parties/{id}(id=${p.id})}" th:text="${p.title}"></a></td>
+                    <td th:text="${p.currentMembers} + '/' + ${p.maxMembers}"></td>
+                    <td><span class="state" th:classappend="'state-' + ${#strings.toLowerCase(p.status.name())}"
+                              th:text="${p.status.label}"></span></td>
+                    <td th:text="${p.pendingCount > 0} ? ${p.pendingCount} + '건' : '-'"></td>
+                    <td th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 신청·참가한 파티 -->
+    <section class="panel section">
+        <h3 th:text="'신청한 파티 (' + ${profile.applications.size()} + ')'">신청한 파티</h3>
+        <p class="hint" th:if="${profile.applications.isEmpty()}">신청한 파티가 없어요.</p>
+        <div class="table-wrap" th:unless="${profile.applications.isEmpty()}">
+            <table class="admin-table">
+                <thead>
+                <tr><th>게임</th><th>파티</th><th>신청 상태</th><th>파티 상태</th><th>신청일</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${profile.applications}">
+                    <td th:text="${a.gameName}"></td>
+                    <td class="wrap"><a th:href="@{/parties/{id}(id=${a.partyId})}" th:text="${a.partyTitle}"></a></td>
+                    <td th:text="${a.applyStatus.label}"></td>
+                    <td><span class="state" th:classappend="'state-' + ${#strings.toLowerCase(a.partyStatus.name())}"
+                              th:text="${a.partyStatus.label}"></span></td>
+                    <td th:text="${#temporals.format(a.appliedAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 받은 리뷰 -->
+    <section class="panel section">
+        <h3 th:text="'받은 리뷰 (' + ${profile.receivedReviews.size()} + ')'">받은 리뷰</h3>
+        <p class="hint" th:if="${profile.receivedReviews.isEmpty()}">받은 리뷰가 없어요.</p>
+        <ul class="members">
+            <li th:each="r : ${profile.receivedReviews}">
+                <span class="nick" th:text="${r.reviewerNickname}"></span>
+                <span class="stars" th:text="${#strings.repeat('★', r.rating)} + ' ' + ${r.rating} + '점'"></span>
+                <span class="sub" th:if="${r.comment != null}" th:text="${r.comment}"></span>
+                <span class="sub meta">
+                    <a th:href="@{/parties/{id}(id=${r.partyId})}" th:text="${r.partyTitle}"></a>
+                    <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></span>
+                </span>
+            </li>
+        </ul>
+        <p class="sub">리뷰를 지우려면 <a th:href="@{/admin/reviews}">리뷰 관리</a>에서 삭제하세요.</p>
+    </section>
+</main>
+</body>
+</html>

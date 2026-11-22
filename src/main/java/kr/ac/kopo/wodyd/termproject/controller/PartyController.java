@@ -1,7 +1,9 @@
 package kr.ac.kopo.wodyd.termproject.controller;
 
 import jakarta.validation.Valid;
+import kr.ac.kopo.wodyd.termproject.domain.Game;
 import kr.ac.kopo.wodyd.termproject.dto.PartyForm;
+import kr.ac.kopo.wodyd.termproject.dto.PartySort;
 import kr.ac.kopo.wodyd.termproject.dto.PartySummary;
 import kr.ac.kopo.wodyd.termproject.service.ParticipationService;
 import kr.ac.kopo.wodyd.termproject.service.PartyService;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/parties")
@@ -32,15 +35,27 @@ public class PartyController {
     @GetMapping
     public String list(@RequestParam(required = false) Long gameId,
                        @RequestParam(required = false) String keyword,
+                       @RequestParam(defaultValue = "false") boolean open,
+                       @RequestParam(required = false) String sort,
                        @RequestParam(defaultValue = "0") int page,
                        Model model) {
         String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
-        Page<PartySummary> parties = partyService.search(gameId, kw, page);
+        PartySort partySort = PartySort.fromCode(sort);
+        Page<PartySummary> parties = partyService.search(gameId, kw, open, partySort, page);
+        List<Game> games = partyService.findGames();
 
         model.addAttribute("parties", parties);
-        model.addAttribute("games", partyService.findGames());
+        model.addAttribute("games", games);
         model.addAttribute("gameId", gameId);
+        // 사이드바에서 고른 게임 (고르지 않았거나 없는 번호면 null)
+        model.addAttribute("selectedGame", gameId == null ? null
+                : games.stream().filter(g -> g.getId().equals(gameId)).findFirst().orElse(null));
         model.addAttribute("keyword", kw);
+        model.addAttribute("open", open);
+        model.addAttribute("sortOptions", PartySort.values());
+        // 최신순은 기본값이라 주소에 붙이지 않는다 (null 이면 th:href 가 파라미터를 생략)
+        model.addAttribute("sort", partySort == PartySort.LATEST ? null : partySort.getCode());
+        model.addAttribute("currentSort", partySort);
         return "parties/list";
     }
 
@@ -48,6 +63,8 @@ public class PartyController {
     public String detail(@PathVariable Long id, Principal principal, Model model) {
         String username = principal == null ? null : principal.getName();
         model.addAttribute("party", partyService.getDetail(id, username));
+        // 오른쪽에 보여 줄 다른 (모집 중인) 파티들: 8개씩 3페이지 = 24개 (넘기는 것은 화면의 스크립트가 한다)
+        model.addAttribute("otherParties", partyService.otherRecruitingParties(id, 24));
         return "parties/detail";
     }
 

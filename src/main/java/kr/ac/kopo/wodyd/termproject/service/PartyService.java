@@ -10,6 +10,7 @@ import kr.ac.kopo.wodyd.termproject.domain.PartyStatus;
 import kr.ac.kopo.wodyd.termproject.dto.ParticipantView;
 import kr.ac.kopo.wodyd.termproject.dto.PartyDetail;
 import kr.ac.kopo.wodyd.termproject.dto.PartyForm;
+import kr.ac.kopo.wodyd.termproject.dto.PartySort;
 import kr.ac.kopo.wodyd.termproject.dto.PartySummary;
 import kr.ac.kopo.wodyd.termproject.dto.ReviewView;
 import kr.ac.kopo.wodyd.termproject.repository.GameRepository;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PartyService {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 12;
 
     private final PartyRepository partyRepository;
     private final PartyMemberRepository partyMemberRepository;
@@ -49,11 +50,45 @@ public class PartyService {
         return gameRepository.findAll(Sort.by("id"));
     }
 
-    /** 게임(선택)과 제목 키워드로 검색한 파티 목록 (최신순, 10개씩) */
+    /** 게임(선택)과 제목 키워드로 검색한 파티 목록 (최신순, 12개씩) */
     public Page<PartySummary> search(Long gameId, String keyword, int page) {
+        return search(gameId, keyword, false, PartySort.LATEST, page);
+    }
+
+    /**
+     * 파티 찾기: 게임(선택), 제목 키워드, '모집 중만 보기', 정렬 기준을 모두 적용한다.
+     * 남은 자리 기준 정렬은 쿼리의 order by 가 정하므로 그때는 pageable 에 Sort 를 넣지 않는다.
+     */
+    public Page<PartySummary> search(Long gameId, String keyword, boolean openOnly, PartySort sort, int page) {
+        int pageIndex = Math.max(page, 0);
+        String kw = keyword == null ? "" : keyword;
+        PartyStatus status = openOnly ? PartyStatus.RECRUITING : null;
+
+        Page<Party> result = switch (sort) {
+            case MOST_SLOTS -> partyRepository.searchByMostSlots(gameId, status, kw, PageRequest.of(pageIndex, PAGE_SIZE));
+            case ENDING_SOON -> partyRepository.searchByEndingSoon(gameId, status, kw, PageRequest.of(pageIndex, PAGE_SIZE));
+            case LATEST -> partyRepository.searchFiltered(gameId, status, kw,
+                    PageRequest.of(pageIndex, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt")));
+        };
+        return result.map(this::toSummary);
+    }
+
+    /** 관리자: 상태(선택)와 제목 키워드로 검색한 파티 목록 (최신순). status 가 null 이면 모든 상태. */
+    public Page<PartySummary> searchByStatus(PartyStatus status, String keyword, int page) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
         String kw = keyword == null ? "" : keyword;
-        return partyRepository.search(gameId, kw, pageable).map(this::toSummary);
+        return partyRepository.searchByStatus(status, kw, pageable).map(this::toSummary);
+    }
+
+    /** 파티 상세 화면 옆에 보여 줄 다른 파티: 지금 보는 파티를 뺀, 모집 중인 최신 파티 */
+    public List<PartySummary> otherRecruitingParties(Long excludeId, int limit) {
+        // 지금 파티가 목록에 끼어 있을 수 있어 한 개 더 읽고 뺀다
+        Pageable pageable = PageRequest.of(0, limit + 1, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return partyRepository.searchByStatus(PartyStatus.RECRUITING, "", pageable).stream()
+                .filter(p -> !p.getId().equals(excludeId))
+                .limit(limit)
+                .map(this::toSummary)
+                .toList();
     }
 
     public PartyDetail getDetail(Long id, String username) {
@@ -164,7 +199,7 @@ public class PartyService {
 
         // 방장도 참가자로 등록한다 (종료 후 리뷰 대상에 포함되도록)
         PartyMember hostMember = PartyMember.builder().party(party).member(host).build();
-        hostMember.approve();
+        hostMember.joinQuietly();
         partyMemberRepository.save(hostMember);
 
         return party.getId();
@@ -216,8 +251,12 @@ public class PartyService {
         return PartySummary.builder()
                 .id(party.getId())
                 .title(party.getTitle())
+                .gameId(party.getGame().getId())
                 .gameName(party.getGame().getName())
+                .gameSlug(party.getGame().getSlug())
                 .hostNickname(party.getHost().getNickname())
+                .hostMannerScore(party.getHost().getMannerScore())
+                .hostReviewCount(party.getHost().getReviewCount())
                 .maxMembers(party.getMaxMembers())
                 .currentMembers(countApproved(party))
                 .status(party.getStatus())

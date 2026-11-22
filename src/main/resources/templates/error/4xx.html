@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>요청을 처리할 수 없어요 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<!-- 403, 404 가 아닌 나머지 4xx (잘못된 주소 값, 허용되지 않는 요청 방식 등) -->
+<main th:replace="~{fragments/error-page :: page(${status}, '요청을 처리할 수 없어요', '요청이 올바르지 않아요. 주소와 입력한 내용을 확인한 뒤 다시 시도해 주세요.')}"></main>
+<script th:src="@{/js/error-page.js}" defer></script>
+</body>
+</html>

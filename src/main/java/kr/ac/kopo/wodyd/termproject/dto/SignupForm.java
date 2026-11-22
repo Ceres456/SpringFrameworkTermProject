@@ -25,6 +25,7 @@ public class SignupForm {
     @Size(min = 2, max = 12, message = "닉네임은 2~12자입니다.")
     private String nickname;
 
+    /** 주로 하는 게임 이름 (선택). 가입 화면의 게임 선택 칸에서 고른다. */
     @Size(max = 50, message = "주 게임은 50자 이내입니다.")
     private String mainGame;
 }

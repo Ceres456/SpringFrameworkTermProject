@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원 탈퇴 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main>
+    <div class="card wide">
+        <h2>회원 탈퇴</h2>
+        <p class="sub" th:text="'@' + ${me.username} + ' (' + ${me.nickname} + ')'"></p>
+
+        <div class="notice fail" th:if="${error}" th:text="${error}"></div>
+
+        <!-- 관리자 계정은 탈퇴할 수 없다 -->
+        <div class="notice fail" sec:authorize="hasRole('ADMIN')">
+            관리자 계정은 탈퇴할 수 없어요. 먼저 다른 관리자가 일반 회원으로 바꿔야 해요.
+        </div>
+
+        <section class="withdraw-warning" sec:authorize="!hasRole('ADMIN')">
+            <h3>탈퇴하면 이렇게 돼요</h3>
+            <ul>
+                <li>계정과 닉네임이 <b>바로 삭제</b>되고, 같은 계정으로 다시 로그인할 수 없어요.</li>
+                <li>내가 만든 파티 <b th:text="${me.hostedParties.size()} + '개'">0개</b>가 참가 내역·리뷰와 함께 삭제돼요.</li>
+                <li>다른 파티에 신청·참가한 내역 <b th:text="${me.applications.size()} + '건'">0건</b>이 삭제돼요.</li>
+                <li>내가 받은 리뷰 <b th:text="${me.receivedReviews.size()} + '개'">0개</b>와 내가 남긴 리뷰가 삭제되고, 상대방의 매너 점수는 남은 리뷰로 다시 계산돼요.</li>
+                <li><b>되돌릴 수 없어요.</b></li>
+            </ul>
+
+            <form th:action="@{/mypage/withdraw}" method="post"
+                  data-confirm="정말 탈퇴할까요?&#10;계정과 만든 파티, 참가 내역, 리뷰가 모두 삭제되며 되돌릴 수 없습니다."
+                  data-confirm-ok="탈퇴하기" data-confirm-tone="danger">
+                <label for="password">비밀번호를 입력해 주세요</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+
+                <div class="actions">
+                    <button type="submit" class="btn danger">회원 탈퇴</button>
+                    <a class="btn ghost" th:href="@{/mypage}">취소</a>
+                </div>
+            </form>
+        </section>
+
+        <div class="actions" sec:authorize="hasRole('ADMIN')">
+            <a class="btn ghost" th:href="@{/mypage}">마이페이지로</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

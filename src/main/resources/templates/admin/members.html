@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원 관리 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main class="admin-page">
+    <h2>관리자 페이지</h2>
+    <nav th:replace="~{fragments/admin-nav :: nav('members')}"></nav>
+
+    <div class="notice ok" th:if="${message}" th:text="${message}"></div>
+    <div class="notice fail" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/admin/members}" method="get" class="finder-search">
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="아이디 또는 닉네임으로 검색" aria-label="회원 검색">
+        <button type="submit" class="btn small">검색</button>
+    </form>
+    <p class="sub" th:text="'회원 ' + ${members.totalElements} + '명'"></p>
+
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+            <tr><th>번호</th><th>아이디</th><th>닉네임</th><th>권한</th><th>매너</th><th>가입일</th><th>관리</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${members.content}">
+                <td th:text="${m.id}"></td>
+                <td th:text="${m.username}"></td>
+                <td><a th:href="@{/admin/members/{id}(id=${m.id})}" th:text="${m.nickname}"></a></td>
+                <td><span class="role-badge" th:classappend="${m.role.name() == 'ADMIN'} ? 'admin'"
+                          th:text="${m.role.name() == 'ADMIN'} ? '관리자' : '회원'"></span></td>
+                <td th:text="${m.reviewCount > 0} ? ${m.mannerScore} + '점 (' + ${m.reviewCount} + '명)' : '-'"></td>
+                <td th:text="${#temporals.format(m.createdAt, 'yyyy-MM-dd')}"></td>
+                <td>
+                    <span class="row-actions" th:if="${m.username == me}">
+                        <a class="btn small ghost" th:href="@{/admin/members/{id}(id=${m.id})}">정보</a>
+                        <span class="sub">(나)</span>
+                    </span>
+                    <span class="row-actions" th:unless="${m.username == me}">
+                        <a class="btn small ghost" th:href="@{/admin/members/{id}(id=${m.id})}">정보</a>
+                        <form th:action="@{/admin/members/{id}/role(id=${m.id})}" method="post"
+                              th:if="${m.role.name() != 'ADMIN'}"
+                              data-confirm="이 회원을 관리자로 올릴까요?&#10;관리자는 모든 회원, 파티, 리뷰를 관리할 수 있어요." data-confirm-ok="권한 부여">
+                            <input type="hidden" name="role" value="ADMIN">
+                            <input type="hidden" name="keyword" th:value="${keyword}">
+                            <input type="hidden" name="page" th:value="${members.number}">
+                            <button type="submit" class="btn small ghost">권한 부여</button>
+                        </form>
+                        <form th:action="@{/admin/members/{id}/role(id=${m.id})}" method="post"
+                              th:unless="${m.role.name() != 'ADMIN'}"
+                              data-confirm="이 관리자를 일반 회원으로 내릴까요?&#10;더 이상 관리자 페이지에 들어올 수 없어요." data-confirm-ok="회원으로 내리기">
+                            <input type="hidden" name="role" value="USER">
+                            <input type="hidden" name="keyword" th:value="${keyword}">
+                            <input type="hidden" name="page" th:value="${members.number}">
+                            <button type="submit" class="btn small ghost">회원으로</button>
+                        </form>
+                        <form th:action="@{/admin/members/{id}/delete(id=${m.id})}" method="post"
+                              data-confirm="이 회원을 삭제할까요?&#10;만든 파티, 참가 내역, 남긴/받은 리뷰도 함께 삭제되며 되돌릴 수 없습니다."
+                              data-confirm-ok="삭제" data-confirm-tone="danger">
+                            <input type="hidden" name="keyword" th:value="${keyword}">
+                            <input type="hidden" name="page" th:value="${members.number}">
+                            <button type="submit" class="btn small danger" th:disabled="${m.role.name() == 'ADMIN'}">삭제</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="hint" th:if="${members.empty}">조건에 맞는 회원이 없어요.</p>
+
+    <div class="pagination" th:if="${members.totalPages > 1}">
+        <a th:each="i : ${#numbers.sequence(0, members.totalPages - 1)}"
+           th:href="@{/admin/members(page=${i}, keyword=${keyword})}"
+           th:text="${i + 1}" th:classappend="${i == members.number} ? 'active'"></a>
+    </div>
+</main>
+</body>
+</html>

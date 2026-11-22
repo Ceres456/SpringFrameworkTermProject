@@ -47,6 +47,17 @@ public class PartyMember {
     @Column(nullable = false, updatable = false)
     private LocalDateTime appliedAt;
 
+    /** 방장이 승인/거절한 시각 (알림용). 방장 처리를 거치지 않은 행은 null */
+    @Column
+    private LocalDateTime decidedAt;
+
+    /**
+     * 신청자가 처리 결과를 확인했는지. false 면 '새 소식'으로 보인다.
+     * 방장 처리를 거치지 않은 행(기존 데이터 포함)은 null 이라 알림에 나오지 않는다.
+     */
+    @Column
+    private Boolean resultSeen;
+
     @Builder
     private PartyMember(Party party, Member member) {
         this.party = party;
@@ -59,11 +70,25 @@ public class PartyMember {
         this.appliedAt = LocalDateTime.now();
     }
 
+    /** 방장이 신청을 승인한다. 신청자에게 알림이 간다. */
     public void approve() {
+        this.status = ApplyStatus.APPROVED;
+        markDecided();
+    }
+
+    /** 방장이 신청을 거절한다. 신청자에게 알림이 간다. */
+    public void reject() {
+        this.status = ApplyStatus.REJECTED;
+        markDecided();
+    }
+
+    /** 알림 없이 참가 처리한다. (방장 본인의 자동 참가, 더미 데이터) */
+    public void joinQuietly() {
         this.status = ApplyStatus.APPROVED;
     }
 
-    public void reject() {
-        this.status = ApplyStatus.REJECTED;
+    private void markDecided() {
+        this.decidedAt = LocalDateTime.now();
+        this.resultSeen = false;
     }
 }

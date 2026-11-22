@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>접근할 수 없어요 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main th:replace="~{fragments/error-page :: page('403', '접근할 수 없어요', '이 페이지는 권한이 있는 사람만 볼 수 있어요. 관리자 페이지는 관리자 계정으로 로그인해야 열려요.')}"></main>
+<script th:src="@{/js/error-page.js}" defer></script>
+</body>
+</html>

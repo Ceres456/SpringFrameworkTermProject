@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  회원 정보 수정 입력칸 (마이페이지 / 관리자 공용). th:object="${memberEditForm}" 가 걸린 폼 안에서 쓴다.
+  인자
+    games                : 게임 목록 (게임 선택 칸용)
+    withCurrentPassword  : true 면 "현재 비밀번호" 칸을 보여 준다 (본인이 비밀번호를 바꿀 때)
+-->
+<div th:fragment="fields(games, withCurrentPassword)">
+    <label for="nickname">닉네임</label>
+    <input type="text" id="nickname" th:field="*{nickname}" maxlength="12">
+    <div class="error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></div>
+
+    <!-- 주로 하는 게임 (선택): 가입, 파티 만들기와 같은 선택 칸 -->
+    <div th:replace="~{fragments/game-picker :: picker(${games}, 'mainGame', true, ${memberEditForm.mainGame}, '주로 하는 게임 (선택)', true)}"></div>
+    <div class="error" th:if="${#fields.hasErrors('mainGame')}" th:errors="*{mainGame}"></div>
+
+    <fieldset class="form-block">
+        <legend>비밀번호 변경</legend>
+        <p class="sub">바꾸지 않으려면 비워 두세요.</p>
+
+        <th:block th:if="${withCurrentPassword}">
+            <label for="currentPassword">현재 비밀번호</label>
+            <input type="password" id="currentPassword" th:field="*{currentPassword}" autocomplete="current-password">
+            <div class="error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+        </th:block>
+
+        <label for="newPassword">새 비밀번호 (6~30자)</label>
+        <input type="password" id="newPassword" th:field="*{newPassword}" autocomplete="new-password">
+        <div class="error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+
+        <label for="newPasswordConfirm">새 비밀번호 확인</label>
+        <input type="password" id="newPasswordConfirm" th:field="*{newPasswordConfirm}" autocomplete="new-password">
+        <div class="error" th:if="${#fields.hasErrors('newPasswordConfirm')}" th:errors="*{newPasswordConfirm}"></div>
+    </fieldset>
+</div>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${formTitle} + ' - GameParty'">파티 - GameParty</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
@@ -16,18 +17,8 @@
                 <div th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
             </div>
 
-            <span class="field-label">게임 선택</span>
-            <div class="game-grid">
-                <label class="game-card" th:each="g : ${games}">
-                    <input type="radio" th:field="*{gameId}" th:value="${g.id}">
-                    <span class="thumb" th:style="'--h:' + ${(g.id * 47) % 360}">
-                        <img th:if="${g.slug != null}" th:src="@{/images/games/{s}.jpg(s=${g.slug})}"
-                             alt="" loading="lazy" onerror="this.remove()">
-                        <span class="thumb-name" th:text="${g.name}"></span>
-                        <span class="check">✓</span>
-                    </span>
-                </label>
-            </div>
+            <!-- 게임 선택: 한 화면에 3 x 3, 옆으로 드래그하면 다음 게임 (공용 조각: fragments/game-picker) -->
+            <div th:replace="~{fragments/game-picker :: picker(${games}, 'gameId', false, ${partyForm.gameId}, '게임 선택', false)}"></div>
             <div class="error" th:if="${#fields.hasErrors('gameId')}" th:errors="*{gameId}"></div>
 
             <label for="title">제목</label>
@@ -54,5 +45,6 @@
         </form>
     </div>
 </main>
+<script th:src="@{/js/game-picker.js}" defer></script>
 </body>
 </html>

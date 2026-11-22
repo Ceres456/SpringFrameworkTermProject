@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 흐르는 게임 이미지 줄들. 첫 화면 배경과 두 번째 화면부터의 양쪽 끝에서 함께 쓴다.
+     위에서부터 오른쪽, 왼쪽, 오른쪽 ... 으로 번갈아 흐른다. -->
+<th:block th:fragment="rows(rows)">
+    <div class="marquee-row" th:each="row, st : ${rows}"
+         th:classappend="${st.index % 2 == 0} ? 'to-right' : 'to-left'">
+        <div class="marquee-track">
+            <!-- 끊김 없이 이어지도록 같은 줄을 두 번 놓는다 -->
+            <th:block th:each="pass : ${#numbers.sequence(1, 2)}">
+                <span class="tile" th:each="g : ${row}" th:style="'--h:' + ${(g.id * 47) % 360}">
+                    <img th:if="${g.slug != null}" th:src="@{/images/games/{s}.jpg(s=${g.slug})}"
+                         alt="" decoding="async" onerror="this.remove()">
+                </span>
+            </th:block>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

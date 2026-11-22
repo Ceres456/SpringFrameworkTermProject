@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>파티 관리 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main class="admin-page" th:with="st=${status != null} ? ${status.name()} : ''">
+    <h2>관리자 페이지</h2>
+    <nav th:replace="~{fragments/admin-nav :: nav('parties')}"></nav>
+
+    <div class="notice ok" th:if="${message}" th:text="${message}"></div>
+    <div class="notice fail" th:if="${error}" th:text="${error}"></div>
+
+    <!-- 상태별로 따로 보기. 검색어는 그대로 유지된다. -->
+    <nav class="status-tabs" aria-label="파티 상태">
+        <a th:href="@{/admin/parties(keyword=${keyword})}" th:classappend="${st == ''} ? 'on'"
+           th:attr="aria-current=${st == ''} ? 'page'">전체 <b th:text="${stats.partyCount}">0</b></a>
+        <a th:href="@{/admin/parties(status='RECRUITING', keyword=${keyword})}" th:classappend="${st == 'RECRUITING'} ? 'on'"
+           th:attr="aria-current=${st == 'RECRUITING'} ? 'page'">모집중 <b th:text="${stats.recruitingCount}">0</b></a>
+        <a th:href="@{/admin/parties(status='FULL', keyword=${keyword})}" th:classappend="${st == 'FULL'} ? 'on'"
+           th:attr="aria-current=${st == 'FULL'} ? 'page'">인원마감 <b th:text="${stats.fullCount}">0</b></a>
+        <a th:href="@{/admin/parties(status='CLOSED', keyword=${keyword})}" th:classappend="${st == 'CLOSED'} ? 'on'"
+           th:attr="aria-current=${st == 'CLOSED'} ? 'page'">종료 <b th:text="${stats.closedCount}">0</b></a>
+    </nav>
+
+    <form th:action="@{/admin/parties}" method="get" class="finder-search">
+        <input type="hidden" name="status" th:if="${st != ''}" th:value="${st}">
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="파티 제목으로 검색" aria-label="파티 검색">
+        <button type="submit" class="btn small">검색</button>
+    </form>
+    <p class="sub" th:text="${(st == '' ? '전체' : status.label) + ' 파티 ' + parties.totalElements + '개'}"></p>
+
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+            <tr><th>번호</th><th>게임</th><th>제목</th><th>방장</th><th>인원</th><th>상태</th><th>작성일</th><th>관리</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${parties.content}">
+                <td th:text="${p.id}"></td>
+                <td th:text="${p.gameName}"></td>
+                <td class="wrap"><a th:href="@{/parties/{id}(id=${p.id})}" th:text="${p.title}"></a></td>
+                <td th:text="${p.hostNickname}"></td>
+                <td th:text="${p.currentMembers} + '/' + ${p.maxMembers}"></td>
+                <td><span class="state" th:classappend="'state-' + ${#strings.toLowerCase(p.status.name())}"
+                          th:text="${p.status.label}"></span></td>
+                <td th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <span class="row-actions">
+                        <form th:action="@{/admin/parties/{id}/close(id=${p.id})}" method="post"
+                              th:unless="${p.status.name() == 'CLOSED'}"
+                              data-confirm="이 파티를 강제로 종료할까요?&#10;종료하면 신청과 수정이 막히고 리뷰를 남길 수 있게 됩니다."
+                              data-confirm-ok="종료하기">
+                            <input type="hidden" name="status" th:if="${st != ''}" th:value="${st}">
+                            <input type="hidden" name="keyword" th:value="${keyword}">
+                            <input type="hidden" name="page" th:value="${parties.number}">
+                            <button type="submit" class="btn small ghost">종료</button>
+                        </form>
+                        <form th:action="@{/admin/parties/{id}/delete(id=${p.id})}" method="post"
+                              data-confirm="이 파티를 삭제할까요?&#10;참가 내역과 이 파티의 리뷰도 함께 삭제되며 되돌릴 수 없습니다."
+                              data-confirm-ok="삭제" data-confirm-tone="danger">
+                            <input type="hidden" name="status" th:if="${st != ''}" th:value="${st}">
+                            <input type="hidden" name="keyword" th:value="${keyword}">
+                            <input type="hidden" name="page" th:value="${parties.number}">
+                            <button type="submit" class="btn small danger">삭제</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="hint" th:if="${parties.empty}">조건에 맞는 파티가 없어요.</p>
+
+    <div class="pagination" th:if="${parties.totalPages > 1}">
+        <a th:each="i : ${#numbers.sequence(0, parties.totalPages - 1)}"
+           th:href="@{/admin/parties(page=${i}, keyword=${keyword}, status=${st != ''} ? ${st} : null)}"
+           th:text="${i + 1}" th:classappend="${i == parties.number} ? 'active'"></a>
+    </div>
+</main>
+</body>
+</html>

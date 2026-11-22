@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${member.nickname} + ' 정보 수정 - GameParty'">회원 정보 수정 - GameParty</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<main class="admin-page">
+    <h2>관리자 페이지</h2>
+    <nav th:replace="~{fragments/admin-nav :: nav('members')}"></nav>
+
+    <p><a class="mini-link back-link" th:href="@{/admin/members/{id}(id=${member.id})}">← 회원 정보로</a></p>
+
+    <div class="card wide edit-card">
+        <h2>회원 정보 수정</h2>
+        <dl class="info">
+            <dt>회원 번호</dt>
+            <dd th:text="${member.id}"></dd>
+            <dt>아이디</dt>
+            <dd th:text="${member.username}"></dd>
+            <dt>가입일</dt>
+            <dd th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd')}"></dd>
+        </dl>
+        <p class="sub">아이디와 가입일은 바꿀 수 없어요. 권한은 회원 정보 화면에서 바꿉니다.</p>
+
+        <form th:action="@{/admin/members/{id}/edit(id=${member.id})}" th:object="${memberEditForm}" method="post">
+            <div th:replace="~{fragments/member-edit-fields :: fields(${games}, false)}"></div>
+            <p class="sub">새 비밀번호를 입력하면 이 회원의 비밀번호가 그 값으로 바뀝니다. 현재 비밀번호는 필요 없어요.</p>
+
+            <div class="actions">
+                <button type="submit" class="btn">저장</button>
+                <a class="btn ghost" th:href="@{/admin/members/{id}(id=${member.id})}">취소</a>
+            </div>
+        </form>
+    </div>
+</main>
+<script th:src="@{/js/game-picker.js}" defer></script>
+</body>
+</html>

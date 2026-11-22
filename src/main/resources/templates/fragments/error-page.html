@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<!--
+  오류 화면 본문 (templates/error/*.html 이 공용으로 쓴다).
+  인자 code : 큰 숫자로 보여 줄 상태 코드, title : 한 줄 제목, message : 설명
+-->
+<main class="error-page" th:fragment="page(code, title, message)">
+    <p class="error-code" aria-hidden="true" th:text="${code}">404</p>
+    <h2 th:text="${title}">페이지를 찾을 수 없어요</h2>
+    <p class="error-message" th:text="${message}">설명</p>
+
+    <div class="actions">
+        <a class="btn" th:href="@{/}">홈으로</a>
+        <a class="btn ghost" th:href="@{/parties}">파티 찾기</a>
+        <a class="btn ghost" th:href="@{/mypage}" sec:authorize="isAuthenticated()">마이페이지</a>
+        <button type="button" class="btn ghost" data-back>이전 페이지</button>
+    </div>
+</main>
+</body>
+</html>

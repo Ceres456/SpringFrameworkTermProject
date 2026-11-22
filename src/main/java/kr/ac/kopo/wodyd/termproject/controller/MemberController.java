@@ -3,6 +3,7 @@ package kr.ac.kopo.wodyd.termproject.controller;
 import jakarta.validation.Valid;
 import kr.ac.kopo.wodyd.termproject.dto.SignupForm;
 import kr.ac.kopo.wodyd.termproject.service.MemberService;
+import kr.ac.kopo.wodyd.termproject.service.PartyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PartyService partyService;
 
     @GetMapping("/login")
     public String loginForm() {
@@ -24,11 +26,12 @@ public class MemberController {
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("signupForm", new SignupForm());
+        model.addAttribute("games", partyService.findGames());
         return "signup";
     }
 
     @PostMapping("/signup")
-    public String signup(@Valid SignupForm signupForm, BindingResult bindingResult) {
+    public String signup(@Valid SignupForm signupForm, BindingResult bindingResult, Model model) {
         if (!bindingResult.hasFieldErrors("password")
                 && !bindingResult.hasFieldErrors("passwordConfirm")
                 && !signupForm.getPassword().equals(signupForm.getPasswordConfirm())) {
@@ -41,6 +44,7 @@ public class MemberController {
             bindingResult.rejectValue("nickname", "duplicate", "이미 사용 중인 닉네임입니다.");
         }
         if (bindingResult.hasErrors()) {
+            model.addAttribute("games", partyService.findGames());
             return "signup";
         }
 
