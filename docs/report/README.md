@@ -4,8 +4,8 @@
 
 | 파일 | 내용 |
 | --- | --- |
-| `GameParty-report-materials.pdf` | 아래 자료를 한 문서로 묶은 PDF (30쪽) |
-| `GameParty-report-draft.pdf` | 보고서 초안 PDF (문서 \"GameParty 텀프로젝트 보고서 (초안)\"을 내보낸 것, 36쪽) |
+| `GameParty-report-materials.pdf` | 아래 자료를 한 문서로 묶은 PDF (31쪽) |
+| `GameParty-report-draft.pdf` | 보고서 초안 PDF (문서 \"GameParty 텀프로젝트 보고서 (초안)\"을 내보낸 것, 37쪽) |
 | `report-materials.html` | 위 PDF의 원본 페이지 (브라우저에서 열어 `Ctrl+P` 로 다시 PDF 로 저장 가능) |
 | `diagrams/er-diagram.svg` | ER 다이어그램 (엔티티 5개, 참가 신청에 알림용 컬럼 포함) |
 | `diagrams/system-architecture.svg` | 시스템 구조도 (계층 구조) |

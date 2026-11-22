@@ -188,6 +188,23 @@
   </div>
 </section>
 
+<section class="tall">
+  <h2>8. 자동화 테스트</h2>
+  <p>테스트는 MySQL 없이 메모리 DB(H2, MySQL 호환 모드)로 돌고, 테스트마다 트랜잭션을 되돌려 서로 영향을 주지 않는다. <code>.\gradlew.bat test</code> 로 실행하며 64개가 모두 통과했다. 정원 검사를 일부러 깨뜨리면 해당 테스트가 실패하는 것도 확인했다.</p>
+  <table>
+    <tr><th style="width:28%">테스트 클래스</th><th>확인하는 규칙</th><th style="width:8%">개수</th></tr>
+    <tr><td><code>ParticipationServiceTest</code></td><td>자기 파티·중복 신청 차단, 모집중에만 신청, 정원이 찼을 때 인원마감, 정원 초과 승인 차단, 취소 시 모집중 복귀, 방장만 처리, 종료된 파티 잠금</td><td>13</td></tr>
+    <tr><td><code>ReviewServiceTest</code></td><td>종료 후에만, 참가자끼리, 자기 자신 제외, 같은 사람에게 1회, 별점·한줄평 검사, 평균 반올림</td><td>8</td></tr>
+    <tr><td><code>NotificationServiceTest</code></td><td>새 신청·승인·거절 알림, 읽음 처리, 방장 자동 참가는 알림 없음</td><td>5</td></tr>
+    <tr><td><code>PartySearchTest</code></td><td>모집중만 보기, 자리 많은 순·마감 임박순 정렬, 키워드·게임 필터, 12개씩 페이지</td><td>9</td></tr>
+    <tr><td><code>WithdrawalServiceTest</code></td><td>비밀번호 확인, 관리자 탈퇴 불가, 딸린 데이터 삭제와 매너 점수 재계산</td><td>4</td></tr>
+    <tr><td><code>AdminServiceTest</code></td><td>권한 부여(자기 자신·마지막 관리자 보호), 회원·파티·리뷰 삭제와 점수 재계산, 강제 종료</td><td>9</td></tr>
+    <tr><td><code>MemberServiceTest</code></td><td>회원가입(BCrypt), 정보 수정 검증(닉네임 중복·주 게임·비밀번호 변경 규칙)</td><td>8</td></tr>
+    <tr><td><code>WebFlowTest</code></td><td>로그인·권한(403)·CSRF, 파티 찾기 인자, 알림 배지의 생김과 사라짐</td><td>7</td></tr>
+    <tr><td><code>TermprojectApplicationTests</code></td><td>애플리케이션이 뜨는지</td><td>1</td></tr>
+  </table>
+</section>
+
 </div>
 </body>
 </html>
