@@ -39,3 +39,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Report materials (submitted separately, kept local only) ###
+docs/report/
